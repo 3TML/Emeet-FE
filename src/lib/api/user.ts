@@ -1,28 +1,44 @@
 import { RegisterForm } from "@/types/user";
+import { apiGet, apiPost } from "./fetcher";
 
-const BASE_URL = "https://emeet.gahonghac.net/api/v1/auth";
+const BASE_URL = "https://emeet.gahonghac.net/api/v1";
+
 export const registerUserApi = async (form: RegisterForm) => {
-  const res = await fetch("/api/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(form),
-  });
-  return res.json();
+  try {
+    return await apiPost("/api/register", form);
+  } catch (error) {
+    console.error("Error registering user:", error);
+    throw error;
+  }
 };
 
 export const getUsersApi = async () => {
-  const res = await fetch("/api/register");
-  return res.json();
+  try {
+    return await apiGet("/api/register");
+  } catch (error) {
+    console.error("Error getting users:", error);
+    throw error;
+  }
 };
 
 export const getTestApi = async () => {
-  const res = await fetch(`${BASE_URL}/testAPI`, {
-  });
-  return res.json();
+  try {
+    return await apiGet(`${BASE_URL}/testAPI`);
+  } catch (error) {
+    console.error("Error in test API:", error);
+    return { error: "Failed to connect to test API" };
+  }
 };
 
 export const getCategoryApi = async () => {
-  const res = await fetch(`${BASE_URL}/GetAll`, {
-  });
-  return res.json();
+  try {
+    return await apiGet(`${BASE_URL}/category/GetAll`, {
+      cache: "no-store",
+      retries: 3,
+      timeout: 15000,
+    });
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    return [];
+  }
 };
