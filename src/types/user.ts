@@ -1,8 +1,18 @@
-export type RegisterForm = {
-  name: string;
-  email: string;
-  password: string;
-};
+  export type RegisterForm = {
+    username: string,
+    password: string,
+    role: string, 
+    gender: string,
+    isExpert: boolean,
+    listCategoryId: string[],
+    experience: string,
+    pricePerMinute: number
+  };
+
+  export type LoginForm = {
+    username: string,
+    password: string
+  };
 
 export type Category = {
   id: string;
@@ -11,4 +21,6 @@ export type Category = {
   dateCreated: Date;
   dateUpdated: Date;
 };
+
+
 

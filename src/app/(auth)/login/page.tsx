@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthForm } from "@/components/valid/authentical";
+import { loginUserApi } from "@/lib/api/user";
+import { LoginForm } from "@/types/user";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 // Slide data
 const SLIDES = [
@@ -33,7 +37,26 @@ const SLIDES = [
 const LoginPage = () => {
   // Slideshow state
   const [currentSlide, setCurrentSlide] = useState(0);
-  
+  const [isLoading, setIsLoading] = useState(false);
+  const [loginUser, setLoginUser] = useState<LoginForm>({
+    username: "",
+    password: "",
+  });
+
+  const router = useRouter();
+
+  const handleLoginUser = async () => {
+    try {
+      const response = await loginUserApi(loginUser);
+      console.log("User logged in successfully:", response);
+      toast.success("Đăng nhập thành công!");
+      router.push("/");
+    } catch (error) {
+      console.error("Error logging in user:", error);
+    }
+  };
+
+
   // Use authentication form hook
   const {
     formData,
@@ -53,9 +76,15 @@ const LoginPage = () => {
   }, []);
   
   // Process login on successful form submission
-  const processLogin = (data: { email: string; password: string }) => {
-    // In a real app, you would call your auth service here
-    console.log("Form submitted:", data);
+  const processLogin = async (data: { username: string; password: string }) => {
+    try {
+      const response = await loginUserApi(data);
+      localStorage.setItem("user", JSON.stringify(response));
+      toast.success("Đăng nhập thành công!");
+      router.push("/");
+    } catch (error) {
+      toast.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin tài khoản.");
+    }
   };
   
   // Slideshow handlers
@@ -69,6 +98,10 @@ const LoginPage = () => {
   
   const goToPrevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
+  };
+
+  const isLoginFormValid = () => {
+    return formData.username && formData.password;
   };
 
   return (
@@ -88,24 +121,24 @@ const LoginPage = () => {
             <p className="text-gray-500 dark:text-gray-400 mb-8 text-sm" tabIndex={0}>The faster you fill up, the faster you get a ticket</p>
             <form className="space-y-5" aria-label="Login form" onSubmit={(e) => handleSubmit(e, processLogin)}>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
                 <Input 
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
+                  id="username"
+                  name="username"
+                  type="text"
+                  value={formData.username}
                   onChange={handleInputChange}
-                  placeholder="youremail@gmail.com"
-                  className={`w-full h-11 rounded-lg ${formErrors.email ? 'border-red-500 focus-visible:ring-red-500' : 'border-gray-300'}`}
+                  placeholder="Username"
+                  className={`w-full h-11 rounded-lg ${formErrors.username ? 'border-red-500 focus-visible:ring-red-500' : 'border-gray-300'}`}
                   required 
-                  aria-label="Email"
-                  aria-invalid={!!formErrors.email}
+                  aria-label="username"
+                  aria-invalid={!!formErrors.username}
                   tabIndex={0}
                 />
-                {formErrors.email && (
+                {formErrors.username && (
                   <div className="flex items-center mt-1 text-xs text-red-500">
                     <AlertCircle size={12} className="mr-1" />
-                    {formErrors.email}
+                    {formErrors.username}
                   </div>
                 )}
               </div>
@@ -139,12 +172,13 @@ const LoginPage = () => {
                 <Link href={{ pathname: "/forgot-password" }} className="text-xs text-gray-500 hover:text-black dark:hover:text-white underline" tabIndex={0} aria-label="Forgot Password">Forgot Password</Link>
               </div>
               <Button 
+                onClick={handleLoginUser}
                 type="submit"
-                disabled={!isFormValid}
+                disabled={!isLoginFormValid()}
                 className={`w-full h-11 rounded-lg font-medium text-base flex items-center justify-center gap-2 ${
-                  isFormValid
-                    ? 'bg-black text-white hover:bg-gray-800'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  !isLoginFormValid()
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-black text-white hover:bg-gray-800'
                 }`}
                 aria-label="Sign In"
                 tabIndex={0}

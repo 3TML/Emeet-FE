@@ -1,13 +1,22 @@
-import { RegisterForm } from "@/types/user";
+import { LoginForm, RegisterForm } from "@/types/user";
 import { apiGet, apiPost } from "./fetcher";
 
 const BASE_URL = "https://emeet.gahonghac.net/api/v1";
 
 export const registerUserApi = async (form: RegisterForm) => {
   try {
-    return await apiPost("/api/register", form);
+    return await apiPost(`${BASE_URL}/auth/RegisterAccount`, form);
   } catch (error) {
     console.error("Error registering user:", error);
+    throw error;
+  }
+};
+
+export const loginUserApi = async (form: LoginForm) => {
+  try {
+    return await apiPost(`${BASE_URL}/auth/LoginByPassword`, form);
+  } catch (error) {
+    console.error("Error login user:", error);
     throw error;
   }
 };
@@ -21,14 +30,7 @@ export const getUsersApi = async () => {
   }
 };
 
-export const getTestApi = async () => {
-  try {
-    return await apiGet(`${BASE_URL}/testAPI`);
-  } catch (error) {
-    console.error("Error in test API:", error);
-    return { error: "Failed to connect to test API" };
-  }
-};
+
 
 export const getCategoryApi = async () => {
   try {

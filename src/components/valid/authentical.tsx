@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 // Email validation function
 export const validateGmail = (email: string): string => {
   if (!email) return "";
-  
+
   const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
   if (!gmailRegex.test(email)) {
     return "Please enter a valid Gmail address";
@@ -13,22 +13,31 @@ export const validateGmail = (email: string): string => {
   return "";
 };
 
+// Username validation function
+export const validateUsername = (username: string): string => {
+  if (!username) return "";
+  if (username.length < 3) {
+    return "Username must be at least 3 characters";
+  }
+  return "";
+};
+
 // Password validation function
 export const validatePassword = (password: string): string => {
   if (!password) return "";
-  
+
   if (password.length < 8) {
     return "Password must be at least 8 characters";
   }
-  
+
   if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
     return "Password must contain at least one special character";
   }
-  
+
   if (!/\d/.test(password)) {
     return "Password must contain at least one number";
   }
-  
+
   return "";
 };
 
@@ -36,40 +45,72 @@ export const validatePassword = (password: string): string => {
 export interface AuthFormData {
   email: string;
   password: string;
+  username: string;
+  role: string,
+  gender: string,
+  isExpert: boolean,
+  listCategoryId: string[],
+  experience: string,
+  pricePerMinute: number
 }
 
 // Form errors interface
 export interface AuthFormErrors {
   email: string;
   password: string;
+  username: string;
+  role: string,
+  gender: string,
+  isExpert: boolean,
+  listCategoryId: string[],
+  experience: string,
+  pricePerMinute: number
 }
 
 // Custom hook for authentication form handling
-export const useAuthForm = (initialData: AuthFormData = { email: "", password: "" }) => {
+export const useAuthForm = (initialData: AuthFormData = {
+  email: "",
+  password: "", 
+  username: "",
+  role: "",
+  gender: "",
+  isExpert: false,
+  listCategoryId: [],
+  experience: "",
+  pricePerMinute: 0,
+}) => {
   // Form state
   const [formData, setFormData] = useState<AuthFormData>(initialData);
   const [formErrors, setFormErrors] = useState<AuthFormErrors>({
     email: "",
-    password: ""
+    password: "", 
+    username: "",
+    role: "",
+    gender: "",
+    isExpert: false,
+    listCategoryId: [],
+    experience: "",
+    pricePerMinute: 0,
   });
   const [isFormValid, setIsFormValid] = useState(false);
-  
+
   // Validate form when input changes
   useEffect(() => {
     validateForm();
   }, [formData]);
-  
+
   // Validate the entire form
   const validateForm = () => {
     const newErrors: AuthFormErrors = {
+      username: validateUsername(formData.username),
       email: validateGmail(formData.email),
       password: validatePassword(formData.password)
     };
-    
+
     setFormErrors(newErrors);
     setIsFormValid(!!(formData.email && formData.password && !newErrors.email && !newErrors.password));
   };
-  
+
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -78,7 +119,7 @@ export const useAuthForm = (initialData: AuthFormData = { email: "", password: "
       [name]: value
     }));
   };
-  
+
   // Handle form submission
   const handleSubmit = (e: React.FormEvent, onSuccess?: (data: AuthFormData) => void) => {
     e.preventDefault();
@@ -86,7 +127,7 @@ export const useAuthForm = (initialData: AuthFormData = { email: "", password: "
       onSuccess(formData);
     }
   };
-  
+
   return {
     formData,
     formErrors,

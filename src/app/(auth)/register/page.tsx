@@ -13,8 +13,10 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthForm } from "@/components/valid/authentical";
-import { getCategoryApi, getTestApi } from "@/lib/api/user";
-import { Category } from "@/types/user";
+import { getCategoryApi, registerUserApi } from "@/lib/api/user";
+import { Category, RegisterForm } from "@/types/user";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 // Slide data for registration
 const SLIDES = [
@@ -42,13 +44,13 @@ const SLIDES = [
 ];
 
 const RegisterPage = () => {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   // Slideshow state
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Form specific state
   const [isExpert, setIsExpert] = useState(false);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [expertise, setExpertise] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -65,13 +67,33 @@ const RegisterPage = () => {
   const isRegisterFormValid = () => {
     return (
       isFormValid &&
-      firstName &&
-      lastName &&
       !confirmPasswordError &&
       termsAccepted &&
       (!isExpert || expertise)
     );
   };
+  const [registerUser, setRegisterUser] = useState<RegisterForm>({
+    username: "",
+    password: "",
+    role: "",
+    gender: "",
+    isExpert: false,
+    listCategoryId: [],
+    experience: "",
+    pricePerMinute: 0,
+  });   
+
+  const handleRegisterUser = async () => {
+    try {
+      const response = await registerUserApi(registerUser);
+      console.log("User registered successfully:", response);
+    } catch (error) {
+      console.error("Error registering user:", error);  
+    }
+  };  
+  
+
+
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -129,18 +151,38 @@ const RegisterPage = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isRegisterFormValid()) {
-      // Process registration
-      console.log("Registration data:", {
-        ...formData,
-        firstName,
-        lastName,
-        isExpert,
-        expertise: isExpert ? expertise : null,
-        termsAccepted,
-      });
+    
+    if (!isRegisterFormValid()) {
+      toast.error("Please fill in all required fields correctly");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const userData: RegisterForm = {
+        username: formData.username,
+        password: formData.password,
+        role: isExpert ? "EXPERT" : "USER",
+        gender: "", // You might want to add gender selection
+        isExpert: isExpert,
+        listCategoryId: isExpert && expertise ? [expertise] : [],
+        experience: isExpert ? expertise : "",
+        pricePerMinute: 0, // You might want to add price input for experts
+      };
+
+      const response = await registerUserApi(userData);
+      
+      if (response) {
+        toast.success("Account created successfully!");
+        router.push("/login"); // Redirect to login page
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error("Failed to create account. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -175,41 +217,23 @@ const RegisterPage = () => {
               onSubmit={handleSubmit}
             >
               {/* Full Name */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="firstName"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  >
-                    First Name
-                  </label>
-                  <Input
-                    id="firstName"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="John"
-                    className="w-full h-11 rounded-lg border-gray-300"
-                    required
-                    aria-label="First Name"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="lastName"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  >
-                    Last Name
-                  </label>
-                  <Input
-                    id="lastName"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Doe"
-                    className="w-full h-11 rounded-lg border-gray-300"
-                    required
-                    aria-label="Last Name"
-                  />
-                </div>
+              <div>
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >
+                  Username
+                </label>
+                <Input
+                  id="username"
+                  name="username"
+                  value={formData.username || ""}
+                  onChange={handleInputChange}
+                  placeholder="johndoe"
+                  className="w-full h-11 rounded-lg border-gray-300"
+                  required
+                  aria-label="Username"
+                />
               </div>
 
               {/* Email */}
@@ -414,16 +438,26 @@ const RegisterPage = () => {
 
               {/* Submit Button */}
               <Button
+                onClick={handleRegisterUser}
                 type="submit"
-                disabled={!isRegisterFormValid()}
+                disabled={!isRegisterFormValid() || isLoading}
                 className={`w-full h-11 rounded-lg font-medium text-base flex items-center justify-center gap-2 mt-4 ${
-                  isRegisterFormValid()
+                  isRegisterFormValid() && !isLoading
                     ? "bg-black text-white hover:bg-gray-800 dark:hover:bg-gray-700"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
                 aria-label="Create Account"
               >
-                Create Account <ArrowRight className="h-4 w-4" />
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Creating Account...
+                  </div>
+                ) : (
+                  <>
+                    Create Account <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
               </Button>
 
               <div className="mt-6 text-center text-sm text-gray-500">
