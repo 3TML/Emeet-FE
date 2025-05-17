@@ -74,12 +74,6 @@ export async function fetchWithRetry<T>(
     try {
       const response = await fetchWithTimeout();
 
-      // Check if response has content
-      const contentLength = response.headers.get("content-length");
-      if (contentLength === "0" || !contentLength) {
-        throw new Error("Empty response received from server");
-      }
-
       // Try to parse JSON, but handle empty responses gracefully
       const text = await response.text();
       if (!text) {
@@ -87,13 +81,9 @@ export async function fetchWithRetry<T>(
       }
 
       try {
-        const data = JSON.parse(text) as T;
-        return data;
-      } catch (error: unknown) {
-        const parseError =
-          error instanceof Error ? error : new Error(String(error));
-        console.error("Failed to parse JSON response:", text);
-        throw new Error(`Invalid JSON response: ${parseError.message}`);
+        return JSON.parse(text);
+      } catch (e) {
+        throw new Error("Invalid JSON response from server");
       }
     } catch (error) {
       // Ensure we capture the full error information

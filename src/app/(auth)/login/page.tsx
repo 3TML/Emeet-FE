@@ -69,16 +69,15 @@ const LoginPage = () => {
       };
       localStorage.setItem("user", JSON.stringify(response));
       toast.success("Đăng nhập thành công!");
-      setTimeout(() => {
-        const role = (response.role || "").toLowerCase();
-        if (role === "admin") {
-          router.push("/dashboard/admin" as any);
-        } else if (role === "expert") {
-          router.push("/dashboard/expert" as any);
-        } else {
-          router.push("/dashboard/user" as any);
-        }
-      }, 0);
+      const role = (response.role || "").toLowerCase();
+      console.log("Login response:", response, "Role:", role);
+      if (role === "admin") {
+        router.push("/dashboard/admin");
+      } else if (role === "expert") {
+        router.push("/dashboard/expert");
+      } else {
+        router.push("/dashboard/user");
+      }
     } catch (error) {
       console.error("Login failed:", error);
       toast.error(
