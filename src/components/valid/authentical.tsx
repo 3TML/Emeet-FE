@@ -46,12 +46,13 @@ export interface AuthFormData {
   email: string;
   password: string;
   username: string;
-  role: string,
-  gender: string,
-  isExpert: boolean,
-  listCategoryId: string[],
-  experience: string,
-  pricePerMinute: number
+  fullName: string;
+  role: string;
+  gender: string;
+  isExpert: boolean;
+  listCategoryId: string[];
+  experience: string;
+  pricePerMinute: number;
 }
 
 // Form errors interface
@@ -59,31 +60,34 @@ export interface AuthFormErrors {
   email: string;
   password: string;
   username: string;
-  role: string,
-  gender: string,
-  isExpert: boolean,
-  listCategoryId: string[],
-  experience: string,
-  pricePerMinute: number
+  role: string;
+  gender: string;
+  isExpert: boolean;
+  listCategoryId: string[];
+  experience: string;
+  pricePerMinute: number;
 }
 
 // Custom hook for authentication form handling
-export const useAuthForm = (initialData: AuthFormData = {
-  email: "",
-  password: "", 
-  username: "",
-  role: "",
-  gender: "",
-  isExpert: false,
-  listCategoryId: [],
-  experience: "",
-  pricePerMinute: 0,
-}) => {
+export const useAuthForm = (
+  initialData: AuthFormData = {
+    email: "",
+    password: "",
+    username: "",
+    fullName: "",
+    role: "",
+    gender: "",
+    isExpert: false,
+    listCategoryId: [],
+    experience: "",
+    pricePerMinute: 0,
+  }
+) => {
   // Form state
   const [formData, setFormData] = useState<AuthFormData>(initialData);
   const [formErrors, setFormErrors] = useState<AuthFormErrors>({
     email: "",
-    password: "", 
+    password: "",
     username: "",
     role: "",
     gender: "",
@@ -104,24 +108,48 @@ export const useAuthForm = (initialData: AuthFormData = {
     const newErrors: AuthFormErrors = {
       username: validateUsername(formData.username),
       email: validateGmail(formData.email),
-      password: validatePassword(formData.password)
+      password: validatePassword(formData.password),
+      role: "",
+      gender: formData.gender ? "" : "Please select your gender",
+      isExpert: false,
+      listCategoryId: [],
+      experience:
+        formData.isExpert && !formData.experience
+          ? "Please enter your experience"
+          : "",
+      pricePerMinute: 0,
     };
 
     setFormErrors(newErrors);
-    setIsFormValid(!!(formData.email && formData.password && !newErrors.email && !newErrors.password));
+    setIsFormValid(
+      !!(
+        formData.email &&
+        formData.password &&
+        formData.fullName &&
+        formData.gender &&
+        !newErrors.email &&
+        !newErrors.password &&
+        !newErrors.gender &&
+        (!formData.isExpert ||
+          (formData.experience && formData.pricePerMinute > 0))
+      )
+    );
   };
 
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent, onSuccess?: (data: AuthFormData) => void) => {
+  const handleSubmit = (
+    e: React.FormEvent,
+    onSuccess?: (data: AuthFormData) => void
+  ) => {
     e.preventDefault();
     if (isFormValid && onSuccess) {
       onSuccess(formData);
@@ -134,6 +162,6 @@ export const useAuthForm = (initialData: AuthFormData = {
     isFormValid,
     handleInputChange,
     handleSubmit,
-    setFormData
+    setFormData,
   };
 };

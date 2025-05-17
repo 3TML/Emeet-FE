@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import { getCategoryApi, registerUserApi } from "@/lib/api/user";
 import { Category, RegisterForm } from "@/types/user";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import EmailOtpRegister from "@/components/EmailOtpRegister";
 
 // Slide data for registration
 const SLIDES = [
@@ -59,9 +60,31 @@ const RegisterPage = () => {
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [categoryError, setCategoryError] = useState<string | null>(null);
 
+  // OTP modal state
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const pendingSubmitRef = useRef<null | (() => void)>(null);
+
   // Use authentication form hook for email/password validation
-  const { formData, formErrors, isFormValid, handleInputChange } =
+  const { formData, formErrors, isFormValid, setFormData, ...restAuthForm } =
     useAuthForm();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "number" ? Number(value) : value,
+      ...(name === "username" ? { email: value } : {}),
+    }));
+  };
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   // Check if all form fields are valid
   const isRegisterFormValid = () => {
@@ -75,25 +98,23 @@ const RegisterPage = () => {
   const [registerUser, setRegisterUser] = useState<RegisterForm>({
     username: "",
     password: "",
+    fullName: "",
     role: "",
     gender: "",
     isExpert: false,
     listCategoryId: [],
     experience: "",
     pricePerMinute: 0,
-  });   
+  });
 
   const handleRegisterUser = async () => {
     try {
       const response = await registerUserApi(registerUser);
       console.log("User registered successfully:", response);
     } catch (error) {
-      console.error("Error registering user:", error);  
+      console.error("Error registering user:", error);
     }
-  };  
-  
-
-
+  };
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -153,30 +174,34 @@ const RegisterPage = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!isRegisterFormValid()) {
       toast.error("Please fill in all required fields correctly");
       return;
     }
-
+    if (!otpVerified) {
+      setShowOtpModal(true);
+      pendingSubmitRef.current = () => handleSubmit(e);
+      return;
+    }
     setIsLoading(true);
     try {
       const userData: RegisterForm = {
-        username: formData.username,
+        username: formData.username, // This is actually the email
         password: formData.password,
+        fullName: formData.fullName,
         role: isExpert ? "EXPERT" : "USER",
-        gender: "", // You might want to add gender selection
+        gender: formData.gender,
         isExpert: isExpert,
         listCategoryId: isExpert && expertise ? [expertise] : [],
-        experience: isExpert ? expertise : "",
-        pricePerMinute: 0, // You might want to add price input for experts
+        experience: isExpert ? formData.experience : "",
+        pricePerMinute: isExpert ? formData.pricePerMinute : 0,
       };
 
       const response = await registerUserApi(userData);
-      
+
       if (response) {
         toast.success("Account created successfully!");
-        router.push("/login"); // Redirect to login page
+        router.push("/login");
       }
     } catch (error) {
       console.error("Registration error:", error);
@@ -184,6 +209,28 @@ const RegisterPage = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Khi xác thực OTP thành công, tự động submit lại form
+  const handleOtpSuccess = () => {
+    setOtpVerified(true);
+    setShowOtpModal(false);
+    // Gọi lại submit nếu có
+    if (pendingSubmitRef.current) {
+      pendingSubmitRef.current();
+      pendingSubmitRef.current = null;
+    }
+  };
+
+  const handleToggleExpert = () => {
+    setIsExpert((prev) => {
+      const next = !prev;
+      setFormData((f) => ({
+        ...f,
+        isExpert: next,
+      }));
+      return next;
+    });
   };
 
   return (
@@ -219,36 +266,47 @@ const RegisterPage = () => {
               {/* Full Name */}
               <div>
                 <label
-                  htmlFor="username"
+                  htmlFor="fullName"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
-                  Username
+                  Full Name
                 </label>
                 <Input
-                  id="username"
-                  name="username"
-                  value={formData.username || ""}
+                  id="fullName"
+                  name="fullName"
+                  value={formData.fullName || ""}
                   onChange={handleInputChange}
-                  placeholder="johndoe"
-                  className="w-full h-11 rounded-lg border-gray-300"
+                  placeholder="John Doe"
+                  className={`w-full h-11 rounded-lg ${
+                    !formData.fullName
+                      ? "border-red-500 focus-visible:ring-red-500"
+                      : "border-gray-300"
+                  }`}
                   required
-                  aria-label="Username"
+                  aria-label="Full Name"
+                  aria-invalid={!formData.fullName}
                 />
+                {!formData.fullName && (
+                  <div className="flex items-center mt-1 text-xs text-red-500">
+                    <AlertCircle size={12} className="mr-1" />
+                    Please enter your full name
+                  </div>
+                )}
               </div>
 
-              {/* Email */}
+              {/* Email (previously Username) */}
               <div>
                 <label
-                  htmlFor="email"
+                  htmlFor="username"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Email
                 </label>
                 <Input
-                  id="email"
-                  name="email"
+                  id="username"
+                  name="username"
                   type="email"
-                  value={formData.email}
+                  value={formData.username || ""}
                   onChange={handleInputChange}
                   placeholder="youremail@gmail.com"
                   className={`w-full h-11 rounded-lg ${
@@ -331,11 +389,45 @@ const RegisterPage = () => {
                 )}
               </div>
 
+              {/* Gender Selection */}
+              <div>
+                <label
+                  htmlFor="gender"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >
+                  Gender
+                </label>
+                <select
+                  id="gender"
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleSelectChange}
+                  className={`w-full h-11 rounded-lg border ${
+                    !formData.gender
+                      ? "border-red-500 focus-visible:ring-red-500"
+                      : "border-input"
+                  } bg-background px-3 text-sm`}
+                  required
+                  aria-invalid={!formData.gender}
+                >
+                  <option value="">Select your gender</option>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
+                </select>
+                {!formData.gender && (
+                  <div className="flex items-center mt-1 text-xs text-red-500">
+                    <AlertCircle size={12} className="mr-1" />
+                    Please select your gender
+                  </div>
+                )}
+              </div>
+
               {/* Expert Registration */}
               <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg">
                 <div
                   className="flex items-center space-x-3 cursor-pointer"
-                  onClick={() => setIsExpert(!isExpert)}
+                  onClick={handleToggleExpert}
                 >
                   <div
                     className={`w-5 h-5 rounded flex items-center justify-center ${
@@ -364,38 +456,109 @@ const RegisterPage = () => {
                       As an expert, you'll be able to offer your expertise to
                       others and set your own rates.
                     </p>
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="expertise"
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                      >
-                        Area of Expertise
-                      </label>
-                      <select
-                        id="expertise"
-                        value={expertise}
-                        onChange={(e) => setExpertise(e.target.value)}
-                        className="w-full h-11 rounded-lg border border-input bg-background px-3 text-sm"
-                        required={isExpert}
-                        disabled={isLoadingCategories}
-                      >
-                        <option value="">Select your area of expertise</option>
-                        {isLoadingCategories ? (
-                          <option value="" disabled>
-                            Loading categories...
+                    <div className="space-y-4">
+                      {/* Expertise Category */}
+                      <div className="space-y-2">
+                        <label
+                          htmlFor="expertise"
+                          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                          Area of Expertise
+                        </label>
+                        <select
+                          id="expertise"
+                          value={expertise}
+                          onChange={(e) => setExpertise(e.target.value)}
+                          className="w-full h-11 rounded-lg border border-input bg-background px-3 text-sm"
+                          required={isExpert}
+                          disabled={isLoadingCategories}
+                        >
+                          <option value="">
+                            Select your area of expertise
                           </option>
-                        ) : categoryError ? (
-                          <option value="" disabled>
-                            {categoryError}
-                          </option>
-                        ) : (
-                          categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                              {category.name}
+                          {isLoadingCategories ? (
+                            <option value="" disabled>
+                              Loading categories...
                             </option>
-                          ))
+                          ) : categoryError ? (
+                            <option value="" disabled>
+                              {categoryError}
+                            </option>
+                          ) : (
+                            categories.map((category) => (
+                              <option key={category.id} value={category.id}>
+                                {category.name}
+                              </option>
+                            ))
+                          )}
+                        </select>
+                      </div>
+
+                      {/* Experience */}
+                      <div className="space-y-2">
+                        <label
+                          htmlFor="experience"
+                          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                          Years of Experience
+                        </label>
+                        <Input
+                          id="experience"
+                          name="experience"
+                          type="text"
+                          value={formData.experience}
+                          onChange={handleInputChange}
+                          placeholder="e.g., 5 years in software development"
+                          className={`w-full h-11 rounded-lg ${
+                            isExpert && !formData.experience
+                              ? "border-red-500 focus-visible:ring-red-500"
+                              : "border-gray-300"
+                          }`}
+                          required={isExpert}
+                          aria-invalid={isExpert && !formData.experience}
+                        />
+                        {isExpert && !formData.experience && (
+                          <div className="flex items-center mt-1 text-xs text-red-500">
+                            <AlertCircle size={12} className="mr-1" />
+                            Please enter your experience
+                          </div>
                         )}
-                      </select>
+                      </div>
+
+                      {/* Price per Minute */}
+                      <div className="space-y-2">
+                        <label
+                          htmlFor="pricePerMinute"
+                          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                          Price per Minute (USD)
+                        </label>
+                        <Input
+                          id="pricePerMinute"
+                          name="pricePerMinute"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={formData.pricePerMinute}
+                          onChange={handleInputChange}
+                          placeholder="0.00"
+                          className={`w-full h-11 rounded-lg ${
+                            isExpert && formData.pricePerMinute <= 0
+                              ? "border-red-500 focus-visible:ring-red-500"
+                              : "border-gray-300"
+                          }`}
+                          required={isExpert}
+                          aria-invalid={
+                            isExpert && formData.pricePerMinute <= 0
+                          }
+                        />
+                        {isExpert && formData.pricePerMinute <= 0 && (
+                          <div className="flex items-center mt-1 text-xs text-red-500">
+                            <AlertCircle size={12} className="mr-1" />
+                            Please enter a valid price per minute
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -438,7 +601,6 @@ const RegisterPage = () => {
 
               {/* Submit Button */}
               <Button
-                onClick={handleRegisterUser}
                 type="submit"
                 disabled={!isRegisterFormValid() || isLoading}
                 className={`w-full h-11 rounded-lg font-medium text-base flex items-center justify-center gap-2 mt-4 ${
@@ -471,6 +633,24 @@ const RegisterPage = () => {
                 </Link>
               </div>
             </form>
+            {/* OTP Modal */}
+            {showOtpModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+                  <EmailOtpRegister
+                    email={formData.email}
+                    fullName={formData.fullName}
+                    onSuccess={handleOtpSuccess}
+                  />
+                  <button
+                    className="mt-4 text-sm text-gray-500 hover:underline"
+                    onClick={() => setShowOtpModal(false)}
+                  >
+                    Đóng
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

@@ -73,10 +73,55 @@ export async function fetchWithRetry<T>(
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const response = await fetchWithTimeout();
-      const data = (await response.json()) as T;
-      return data;
+
+      // Check if response is empty
+      const text = await response.text();
+      if (!text) {
+        throw new Error("Empty response received from server");
+      }
+
+      // Try to parse JSON
+      try {
+        const data = JSON.parse(text) as T;
+        return data;
+      } catch (parseError: unknown) {
+        const errorMessage =
+          parseError instanceof Error
+            ? parseError.message
+            : "Unknown parse error";
+        console.error("Failed to parse JSON response:", {
+          status: response.status,
+          statusText: response.statusText,
+          responseText: text,
+          headers: Object.fromEntries(response.headers.entries()),
+        });
+        throw new Error(`Invalid JSON response: ${errorMessage}`);
+      }
     } catch (error) {
+      // Ensure we capture the full error information
       lastError = error instanceof Error ? error : new Error(String(error));
+
+      // Enhanced error logging with more details
+      const errorDetails = {
+        url,
+        errorMessage: lastError.message,
+        errorName: lastError.name,
+        errorStack: lastError.stack,
+        status: error instanceof Response ? error.status : "unknown",
+        statusText: error instanceof Response ? error.statusText : "unknown",
+        headers:
+          error instanceof Response
+            ? Object.fromEntries(error.headers.entries())
+            : "unknown",
+        attempt: attempt + 1,
+        timestamp: new Date().toISOString(),
+      };
+
+      console.error("API Request Failed:", {
+        ...errorDetails,
+        // Include the original error for debugging
+        originalError: error,
+      });
 
       // Network errors are retryable, other errors may not be
       const isNetworkError =
