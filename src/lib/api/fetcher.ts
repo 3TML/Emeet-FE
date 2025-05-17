@@ -74,12 +74,23 @@ export async function fetchWithRetry<T>(
     try {
       const response = await fetchWithTimeout();
 
+<<<<<<< Updated upstream
       // Check if response is empty
+=======
+      // Check if response has content
+      const contentLength = response.headers.get("content-length");
+      if (contentLength === "0" || !contentLength) {
+        throw new Error("Empty response received from server");
+      }
+
+      // Try to parse JSON, but handle empty responses gracefully
+>>>>>>> Stashed changes
       const text = await response.text();
       if (!text) {
         throw new Error("Empty response received from server");
       }
 
+<<<<<<< Updated upstream
       // Try to parse JSON
       try {
         const data = JSON.parse(text) as T;
@@ -96,6 +107,16 @@ export async function fetchWithRetry<T>(
           headers: Object.fromEntries(response.headers.entries()),
         });
         throw new Error(`Invalid JSON response: ${errorMessage}`);
+=======
+      try {
+        const data = JSON.parse(text) as T;
+        return data;
+      } catch (error: unknown) {
+        const parseError =
+          error instanceof Error ? error : new Error(String(error));
+        console.error("Failed to parse JSON response:", text);
+        throw new Error(`Invalid JSON response: ${parseError.message}`);
+>>>>>>> Stashed changes
       }
     } catch (error) {
       // Ensure we capture the full error information
