@@ -63,7 +63,7 @@ const RegisterPage = () => {
   // OTP modal state
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
-  const pendingSubmitRef = useRef<null | (() => void)>(null);
+  const [shouldSubmitAfterOtp, setShouldSubmitAfterOtp] = useState(false);
 
   // Use authentication form hook for email/password validation
   const { formData, formErrors, isFormValid, setFormData, ...restAuthForm } =
@@ -174,13 +174,15 @@ const RegisterPage = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("handleSubmit called, otpVerified:", otpVerified);
     if (!isRegisterFormValid()) {
       toast.error("Please fill in all required fields correctly");
       return;
     }
     if (!otpVerified) {
       setShowOtpModal(true);
-      pendingSubmitRef.current = () => handleSubmit(e);
+      setShouldSubmitAfterOtp(true);
+      console.log("OTP not verified, set shouldSubmitAfterOtp and open modal");
       return;
     }
     setIsLoading(true);
@@ -196,9 +198,8 @@ const RegisterPage = () => {
         experience: isExpert ? formData.experience : "",
         pricePerMinute: isExpert ? formData.pricePerMinute : 0,
       };
-
+      console.log("Registering user with data:", userData);
       const response = await registerUserApi(userData);
-
       if (response) {
         toast.success("Account created successfully!");
         router.push("/login");
@@ -211,16 +212,23 @@ const RegisterPage = () => {
     }
   };
 
-  // Khi xác thực OTP thành công, tự động submit lại form
+  // Khi xác thực OTP thành công, chỉ set flag
   const handleOtpSuccess = () => {
     setOtpVerified(true);
     setShowOtpModal(false);
-    // Gọi lại submit nếu có
-    if (pendingSubmitRef.current) {
-      pendingSubmitRef.current();
-      pendingSubmitRef.current = null;
-    }
+    console.log("OTP verified, will trigger submit via effect");
   };
+
+  // Effect: khi otpVerified và shouldSubmitAfterOtp, tự động submit lại
+  useEffect(() => {
+    if (otpVerified && shouldSubmitAfterOtp) {
+      setShouldSubmitAfterOtp(false);
+      // Tạo event giả để gọi lại handleSubmit
+      const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
+      handleSubmit(fakeEvent);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [otpVerified, shouldSubmitAfterOtp]);
 
   const handleToggleExpert = () => {
     setIsExpert((prev) => {
