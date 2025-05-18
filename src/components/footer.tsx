@@ -4,6 +4,69 @@ import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
+import type { UrlObject } from "url";
+
+// Define route types
+type Route =
+  | "/experts"
+  | "/how-it-works"
+  | "/pricing"
+  | "/faq"
+  | "/register"
+  | "/expert-resources"
+  | "/success-stories"
+  | "/expert-faq"
+  | "/about"
+  | "/careers"
+  | "/contact"
+  | "/privacy"
+  | "/terms"
+  | "/sitemap";
+
+// Define footer links data with UrlObject type
+const footerLinks = {
+  clients: [
+    { href: { pathname: "/experts" } as UrlObject, label: "Find an Expert" },
+    { href: { pathname: "/how-it-works" } as UrlObject, label: "How It Works" },
+    { href: { pathname: "/pricing" } as UrlObject, label: "Pricing" },
+    { href: { pathname: "/faq" } as UrlObject, label: "FAQ" },
+  ],
+  experts: [
+    {
+      href: { pathname: "/register", query: { expert: "true" } } as UrlObject,
+      label: "Join as an Expert",
+    },
+    {
+      href: { pathname: "/expert-resources" } as UrlObject,
+      label: "Resources",
+    },
+    {
+      href: { pathname: "/success-stories" } as UrlObject,
+      label: "Success Stories",
+    },
+    { href: { pathname: "/expert-faq" } as UrlObject, label: "Expert FAQ" },
+  ],
+  company: [
+    { href: { pathname: "/about" } as UrlObject, label: "About Us" },
+    { href: { pathname: "/careers" } as UrlObject, label: "Careers" },
+    { href: { pathname: "/contact" } as UrlObject, label: "Contact" },
+    { href: { pathname: "/privacy" } as UrlObject, label: "Privacy Policy" },
+    { href: { pathname: "/terms" } as UrlObject, label: "Terms of Service" },
+  ],
+  bottom: [
+    { href: { pathname: "/privacy" } as UrlObject, label: "Privacy" },
+    { href: { pathname: "/terms" } as UrlObject, label: "Terms" },
+    { href: { pathname: "/sitemap" } as UrlObject, label: "Sitemap" },
+  ],
+} as const;
+
+// Social media links
+const socialLinks = [
+  { icon: Facebook, label: "Facebook", href: "#" },
+  { icon: Twitter, label: "Twitter", href: "#" },
+  { icon: Linkedin, label: "LinkedIn", href: "#" },
+  { icon: Instagram, label: "Instagram", href: "#" },
+] as const;
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -51,165 +114,71 @@ export default function Footer() {
               solutions. Our platform brings professionals and clients together.
             </p>
             <div className="flex space-x-4">
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="Facebook"
-              >
-                <Facebook size={18} />
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter size={18} />
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="LinkedIn"
-              >
-                <Linkedin size={18} />
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="Instagram"
-              >
-                <Instagram size={18} />
-              </a>
+              {socialLinks.map(({ icon: Icon, label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  className="text-gray-400 hover:text-white transition-colors"
+                  aria-label={label}
+                >
+                  <Icon size={18} />
+                </a>
+              ))}
             </div>
           </motion.div>
 
-          {/* Links Section 1 */}
+          {/* Links Sections */}
           <motion.div variants={itemVariants}>
             <h4 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">
               For Clients
             </h4>
             <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/experts"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  Find an Expert
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/how-it-works"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  How It Works
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/pricing"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  Pricing
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/faq"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  FAQ
-                </Link>
-              </li>
+              {footerLinks.clients.map(({ href, label }) => (
+                <li key={label}>
+                  <Link
+                    href={href}
+                    className="text-gray-400 hover:text-white transition-colors text-sm"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </motion.div>
 
-          {/* Links Section 2 */}
           <motion.div variants={itemVariants}>
             <h4 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">
               For Experts
             </h4>
             <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/register?expert=true"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  Join as an Expert
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/expert-resources"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  Resources
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/success-stories"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  Success Stories
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/expert-faq"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  Expert FAQ
-                </Link>
-              </li>
+              {footerLinks.experts.map(({ href, label }) => (
+                <li key={label}>
+                  <Link
+                    href={href}
+                    className="text-gray-400 hover:text-white transition-colors text-sm"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </motion.div>
 
-          {/* Links Section 3 */}
           <motion.div variants={itemVariants}>
             <h4 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">
               Company
             </h4>
             <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/about"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/careers"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  Careers
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/privacy"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/terms"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  Terms of Service
-                </Link>
-              </li>
+              {footerLinks.company.map(({ href, label }) => (
+                <li key={label}>
+                  <Link
+                    href={href}
+                    className="text-gray-400 hover:text-white transition-colors text-sm"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </motion.div>
         </div>
@@ -248,24 +217,19 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row md:justify-between items-center">
             <p>&copy; {currentYear} ExpertMeet. All rights reserved.</p>
             <div className="mt-4 md:mt-0">
-              <Link
-                href="/privacy"
-                className="text-gray-500 hover:text-gray-400 transition-colors mr-4"
-              >
-                Privacy
-              </Link>
-              <Link
-                href="/terms"
-                className="text-gray-500 hover:text-gray-400 transition-colors mr-4"
-              >
-                Terms
-              </Link>
-              <Link
-                href="/sitemap"
-                className="text-gray-500 hover:text-gray-400 transition-colors"
-              >
-                Sitemap
-              </Link>
+              {footerLinks.bottom.map(({ href, label }, index) => (
+                <React.Fragment key={label}>
+                  <Link
+                    href={href}
+                    className="text-gray-500 hover:text-gray-400 transition-colors"
+                  >
+                    {label}
+                  </Link>
+                  {index < footerLinks.bottom.length - 1 && (
+                    <span className="mx-4">|</span>
+                  )}
+                </React.Fragment>
+              ))}
             </div>
           </div>
         </motion.div>
