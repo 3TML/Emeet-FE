@@ -12,11 +12,6 @@ import { Star, Clock } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
-type BookingPageProps = {
-  params: { id: string };
-  searchParams?: Record<string, string | string[]>;
-};
-
 const getExpertById = (id: string) => {
   return {
     id: parseInt(id),
@@ -60,7 +55,13 @@ const getExpertById = (id: string) => {
   };
 };
 
-export default function BookingPage({ params }: BookingPageProps) {
+export default function BookingPage({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams?: Record<string, string | string[]>;
+}) {
   const expert = getExpertById(params.id);
 
   return (
