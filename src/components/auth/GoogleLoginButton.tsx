@@ -42,7 +42,7 @@ const GoogleLoginButton = () => {
       } else {
         router.push("/dashboard/user");
       }
-    } catch (error) {
+    } catch {
       toast.error("Đăng nhập Google thất bại. Vui lòng thử lại.");
     }
   };

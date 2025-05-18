@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(result, { status: result.success ? 200 : 400 });
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const users = await getUsersApi();
   return NextResponse.json(users);
 }

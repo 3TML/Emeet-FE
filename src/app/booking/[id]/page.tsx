@@ -8,7 +8,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Clock, Calendar, DollarSign, Star, Check } from "lucide-react";
+import { Star, Clock } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
