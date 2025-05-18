@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { Category, RegisterForm } from "@/types/user";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import EmailOtpRegister from "@/components/EmailOtpRegister";
+import Image from "next/image";
 
 // Slide data for registration
 const SLIDES = [
@@ -66,8 +67,7 @@ const RegisterPage = () => {
   const [shouldSubmitAfterOtp, setShouldSubmitAfterOtp] = useState(false);
 
   // Use authentication form hook for email/password validation
-  const { formData, formErrors, isFormValid, setFormData, ...restAuthForm } =
-    useAuthForm();
+  const { formData, formErrors, isFormValid, setFormData } = useAuthForm();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -94,26 +94,6 @@ const RegisterPage = () => {
       termsAccepted &&
       (!isExpert || expertise)
     );
-  };
-  const [registerUser, setRegisterUser] = useState<RegisterForm>({
-    username: "",
-    password: "",
-    fullName: "",
-    role: "",
-    gender: "",
-    isExpert: false,
-    listCategoryId: [],
-    experience: "",
-    pricePerMinute: 0,
-  });
-
-  const handleRegisterUser = async () => {
-    try {
-      const response = await registerUserApi(registerUser);
-      console.log("User registered successfully:", response);
-    } catch (error) {
-      console.error("Error registering user:", error);
-    }
   };
 
   useEffect(() => {
@@ -674,10 +654,12 @@ const RegisterPage = () => {
               transition={{ duration: 1 }}
               className="absolute inset-0"
             >
-              <img
+              <Image
                 src={SLIDES[currentSlide].image}
                 alt={SLIDES[currentSlide].title}
                 className="object-cover w-full h-full"
+                width={1000}
+                height={1000}
               />
 
               {/* Overlayed Text */}

@@ -13,11 +13,11 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthForm } from "@/components/valid/authentical";
 import { loginUserApi } from "@/lib/api/user";
-import { LoginForm } from "@/types/user";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import GoogleOAuthProviderWrapper from "@/components/auth/GoogleOAuthProviderWrapper";
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
+import Image from "next/image";
 
 // Slide data
 const SLIDES = [
@@ -51,8 +51,7 @@ const LoginPage = () => {
   const router = useRouter();
 
   // Use authentication form hook
-  const { formData, formErrors, isFormValid, handleInputChange, handleSubmit } =
-    useAuthForm();
+  const { formData, formErrors, handleInputChange } = useAuthForm();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,10 +109,6 @@ const LoginPage = () => {
 
   const goToPrevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
-  };
-
-  const isLoginFormValid = () => {
-    return formData.username && formData.password;
   };
 
   return (
@@ -285,9 +280,11 @@ const LoginPage = () => {
                 transition={{ duration: 1 }}
                 className="absolute inset-0"
               >
-                <img
+                <Image
                   src={SLIDES[currentSlide].image}
                   alt={SLIDES[currentSlide].title}
+                  width={800}
+                  height={600}
                   className="object-cover w-full h-full"
                 />
 
