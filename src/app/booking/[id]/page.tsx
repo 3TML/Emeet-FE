@@ -12,8 +12,8 @@ import { Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
-// ✅ Hàm lấy dữ liệu chuyên gia được đánh dấu async
-const getExpertById = async (id: string) => {
+// Change getExpertById to a synchronous function
+const getExpertById = (id: string) => {
   return {
     id: parseInt(id),
     name: "Dr. Emily Chen",
@@ -56,13 +56,9 @@ const getExpertById = async (id: string) => {
   };
 };
 
-// ✅ Component là async function để dùng await
-export default async function BookingPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const expert = await getExpertById(params.id);
+// Change BookingPage to a synchronous function
+export default function BookingPage({ params }: { params: { id: string } }) {
+  const expert = getExpertById(params.id);
 
   return (
     <div className="container mx-auto px-4 py-12">
