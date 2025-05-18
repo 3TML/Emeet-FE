@@ -74,7 +74,7 @@ const EmailOtpRegister: React.FC<EmailOtpRegisterProps> = ({
             setError(otpText || "Không gửi được OTP. Vui lòng thử lại.");
           }
         }
-      } catch (e) {
+      } catch {
         setError("Có lỗi xảy ra. Vui lòng thử lại.");
       } finally {
         setLoading(false);
@@ -107,7 +107,7 @@ const EmailOtpRegister: React.FC<EmailOtpRegisterProps> = ({
       } else {
         setError(text || "OTP không đúng hoặc đã hết hạn.");
       }
-    } catch (e) {
+    } catch {
       setError("Có lỗi xảy ra. Vui lòng thử lại.");
     } finally {
       setLoading(false);
