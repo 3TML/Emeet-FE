@@ -55,13 +55,7 @@ const getExpertById = (id: string) => {
   };
 };
 
-export default function BookingPage({
-  params,
-  searchParams,
-}: {
-  params: { id: string };
-  searchParams?: Record<string, string | string[]>;
-}) {
+export default function BookingPage({ params }: { params: { id: string } }) {
   const expert = getExpertById(params.id);
 
   return (
