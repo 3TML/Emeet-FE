@@ -56,8 +56,13 @@ const getExpertById = (id: string) => {
   };
 };
 
-export default async function Page({ params }: { params: { id: string } }) {
-  const expert = getExpertById(params.id);
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const resolvedParams = await params;
+  const expert = getExpertById(resolvedParams.id);
 
   return (
     <div className="container mx-auto px-4 py-12">
