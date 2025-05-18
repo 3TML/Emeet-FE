@@ -12,7 +12,8 @@ import { Star, Clock } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
-const getExpertById = (id: string) => {
+// ✅ Hàm lấy dữ liệu chuyên gia được đánh dấu async
+const getExpertById = async (id: string) => {
   return {
     id: parseInt(id),
     name: "Dr. Emily Chen",
@@ -55,8 +56,13 @@ const getExpertById = (id: string) => {
   };
 };
 
-export default function BookingPage({ params }: { params: { id: string } }) {
-  const expert = getExpertById(params.id);
+// ✅ Component là async function để dùng await
+export default async function BookingPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const expert = await getExpertById(params.id);
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -117,176 +123,72 @@ export default function BookingPage({ params }: { params: { id: string } }) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {/* Step 1: Select Service */}
+                  {/* Select Service */}
                   <div>
-                    <h3 className="text-lg font-medium mb-4">
-                      1. Select a Service
-                    </h3>
-                    <div className="space-y-3">
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                      Select Service
+                    </label>
+                    <select className="w-full border rounded px-3 py-2 text-sm">
                       {expert.services.map((service) => (
-                        <div
-                          key={service.id}
-                          className="border rounded-lg p-4 hover:border-primary cursor-pointer transition-colors"
-                        >
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h4 className="font-medium">{service.name}</h4>
-                              <p className="text-sm text-gray-600 mt-1">
-                                {service.description}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <div className="flex items-center justify-end text-sm text-gray-600">
-                                <Clock className="h-4 w-4 mr-1" />
-                                <span>{service.duration}</span>
-                              </div>
-                              <p className="font-bold mt-1">${service.price}</p>
-                            </div>
-                          </div>
-                        </div>
+                        <option key={service.id}>
+                          {service.name} - {service.duration} - ${service.price}
+                        </option>
                       ))}
-                    </div>
+                    </select>
                   </div>
 
-                  {/* Step 2: Select Date */}
+                  {/* Select Date */}
                   <div>
-                    <h3 className="text-lg font-medium mb-4">
-                      2. Select a Date
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {expert.availability.map((day) => (
-                        <button
-                          key={day.date}
-                          className="border rounded-md px-4 py-2 text-sm hover:border-primary hover:bg-primary/5 transition-colors"
-                        >
-                          {new Date(day.date).toLocaleDateString("en-US", {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </button>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                      Select Date
+                    </label>
+                    <select className="w-full border rounded px-3 py-2 text-sm">
+                      {expert.availability.map((day, index) => (
+                        <option key={index}>{day.date}</option>
                       ))}
-                    </div>
+                    </select>
                   </div>
 
-                  {/* Step 3: Select Time */}
+                  {/* Select Time Slot */}
                   <div>
-                    <h3 className="text-lg font-medium mb-4">
-                      3. Select a Time
-                    </h3>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                      {expert.availability[0].slots.map((slot) => (
-                        <button
-                          key={slot}
-                          className="border rounded-md px-4 py-2 text-sm hover:border-primary hover:bg-primary/5 transition-colors"
-                        >
-                          {slot}
-                        </button>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                      Select Time
+                    </label>
+                    <select className="w-full border rounded px-3 py-2 text-sm">
+                      {expert.availability[0].slots.map((slot, index) => (
+                        <option key={index}>{slot}</option>
                       ))}
-                    </div>
+                    </select>
                   </div>
 
-                  {/* Step 4: Contact Info */}
+                  {/* User Info */}
                   <div>
-                    <h3 className="text-lg font-medium mb-4">
-                      4. Your Contact Information
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <label
-                          htmlFor="firstName"
-                          className="block text-sm font-medium mb-1"
-                        >
-                          First Name
-                        </label>
-                        <Input id="firstName" placeholder="John" />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="lastName"
-                          className="block text-sm font-medium mb-1"
-                        >
-                          Last Name
-                        </label>
-                        <Input id="lastName" placeholder="Doe" />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="email"
-                          className="block text-sm font-medium mb-1"
-                        >
-                          Email
-                        </label>
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="john@example.com"
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="phone"
-                          className="block text-sm font-medium mb-1"
-                        >
-                          Phone Number
-                        </label>
-                        <Input id="phone" placeholder="+1 (555) 123-4567" />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="notes"
-                        className="block text-sm font-medium mb-1"
-                      >
-                        Notes (Optional)
-                      </label>
-                      <textarea
-                        id="notes"
-                        rows={3}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                        placeholder="Share any specific topics or questions you'd like to discuss"
-                      ></textarea>
-                    </div>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                      Your Email
+                    </label>
+                    <Input type="email" placeholder="you@example.com" />
                   </div>
 
-                  {/* Summary & Payment */}
-                  <div className="border-t pt-6">
-                    <h3 className="text-lg font-medium mb-4">
-                      Booking Summary
-                    </h3>
-                    <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Service:</span>
-                          <span className="font-medium">Strategy Session</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Date & Time:</span>
-                          <span className="font-medium">
-                            May 15, 2025 at 09:00 AM
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Duration:</span>
-                          <span className="font-medium">60 minutes</span>
-                        </div>
-                        <div className="flex justify-between border-t pt-2 mt-2">
-                          <span className="font-medium">Total:</span>
-                          <span className="font-bold text-lg">$150</span>
-                        </div>
-                      </div>
-                    </div>
+                  {/* Summary */}
+                  <div className="border rounded p-4 text-sm text-gray-700 bg-gray-50">
+                    <p>
+                      You’re booking <strong>{expert.name}</strong> for a{" "}
+                      <strong>{expert.services[0].name}</strong> session on{" "}
+                      <strong>{expert.availability[0].date}</strong> at{" "}
+                      <strong>{expert.availability[0].slots[0]}</strong>.
+                    </p>
+                    <p className="mt-2">
+                      Total: <strong>${expert.services[0].price}</strong>
+                    </p>
+                  </div>
 
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Lock className="h-4 w-4 mr-1" />
-                        <span>Secure payment processing</span>
-                      </div>
-                      <Button size="lg" className="px-8">
-                        Proceed to Payment
-                      </Button>
-                    </div>
+                  {/* Confirm Button */}
+                  <Button className="w-full">Confirm Booking</Button>
+
+                  {/* Secure Info */}
+                  <div className="flex items-center justify-center mt-4 text-xs text-gray-500">
+                    <Lock className="w-4 h-4 mr-1" />
+                    Your information is securely encrypted
                   </div>
                 </div>
               </CardContent>
@@ -298,7 +200,7 @@ export default function BookingPage({ params }: { params: { id: string } }) {
   );
 }
 
-// Lock icon component
+// Lock icon
 function Lock(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
