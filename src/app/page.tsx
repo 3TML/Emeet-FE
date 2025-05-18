@@ -1,7 +1,25 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import type { Route } from "next";
 import Link from "next/link";
 import { ArrowRight, Star, Calendar, Search, Filter } from "lucide-react";
 import LazyImage from "@/components/ui/lazy-image";
 import LazySection from "@/components/ui/lazy-section";
+
+// Define route types
+type ExpertsRoute = Route<"/experts">;
+type ExpertDetailRoute = Route<"/experts/[id]">;
+type BookingRoute = Route<"/booking/[id]">;
+type SignUpRoute = Route<"/signup">;
+type CategoryRoute = Route<"/category/[slug]">;
+
+type AppRoute =
+  | ExpertsRoute
+  | ExpertDetailRoute
+  | BookingRoute
+  | SignUpRoute
+  | CategoryRoute;
 
 export default function HomePage() {
   // In a real application, this would be fetched from an API
@@ -75,14 +93,38 @@ export default function HomePage() {
   ];
 
   const categories = [
-    "Business Strategy",
-    "Marketing",
-    "Finance",
-    "Leadership",
-    "Data Science",
-    "Product Management",
-    "Software Development",
-    "HR & Recruitment",
+    {
+      name: "Business Strategy",
+      slug: "business-strategy",
+    },
+    {
+      name: "Marketing",
+      slug: "marketing",
+    },
+    {
+      name: "Finance",
+      slug: "finance",
+    },
+    {
+      name: "Leadership",
+      slug: "leadership",
+    },
+    {
+      name: "Data Science",
+      slug: "data-science",
+    },
+    {
+      name: "Product Management",
+      slug: "product-management",
+    },
+    {
+      name: "Software Development",
+      slug: "software-development",
+    },
+    {
+      name: "HR & Recruitment",
+      slug: "hr-recruitment",
+    },
   ];
 
   const benefits = [
@@ -135,13 +177,13 @@ export default function HomePage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/register"
-                className="inline-flex items-center justify-center h-12 px-6 font-medium rounded-lg bg-white text-primary hover:bg-gray-100 transition-colors"
+                href={"/signup" as SignUpRoute}
+                className="inline-flex items-center justify-center h-12 px-6 font-medium rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors"
               >
                 Create an Account
               </Link>
               <Link
-                href="/experts"
+                href={"/experts" as ExpertsRoute}
                 className="inline-flex items-center justify-center h-12 px-6 font-medium rounded-lg bg-primary-foreground/20 border border-white/30 backdrop-blur-sm text-white hover:bg-primary-foreground/30 transition-colors"
               >
                 Browse All Experts
@@ -184,8 +226,8 @@ export default function HomePage() {
                   <select className="w-full h-12 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-transparent">
                     <option value="">All Categories</option>
                     {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
+                      <option key={category.slug} value={category.slug}>
+                        {category.name}
                       </option>
                     ))}
                   </select>
@@ -299,13 +341,13 @@ export default function HomePage() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <Link
-                      href={`/experts/${expert.id}`}
+                      href={`/experts/${expert.id}` as ExpertDetailRoute}
                       className="flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
                     >
                       View Profile
                     </Link>
                     <Link
-                      href={`/booking/${expert.id}`}
+                      href={`/booking/${expert.id}` as BookingRoute}
                       className="flex items-center justify-center h-10 px-4 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors text-sm font-medium"
                     >
                       Book Now
@@ -318,7 +360,7 @@ export default function HomePage() {
 
           <div className="mt-12 text-center">
             <Link
-              href="/experts"
+              href={"/experts" as ExpertsRoute}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
             >
               View All Experts
@@ -345,15 +387,11 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
             {categories.map((category) => (
               <Link
-                href={`/category/${category
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")}`}
-                key={category}
-                className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm text-center hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700"
+                href={`/category/${category.slug}` as CategoryRoute}
+                key={category.slug}
+                className="flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
               >
-                <h3 className="font-medium text-gray-900 dark:text-white">
-                  {category}
-                </h3>
+                {category.name}
               </Link>
             ))}
           </div>
