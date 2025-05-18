@@ -56,13 +56,14 @@ const getExpertById = (id: string) => {
   };
 };
 
-// Change BookingPage to use correct Next.js 15+ types
-export default async function BookingPage({
-  params,
-}: {
-  params: { id: string };
+interface PageProps {
+  params: {
+    id: string;
+  };
   searchParams?: { [key: string]: string | string[] | undefined };
-}) {
+}
+
+export default function BookingPage({ params, searchParams }: PageProps) {
   const expert = getExpertById(params.id);
 
   return (
