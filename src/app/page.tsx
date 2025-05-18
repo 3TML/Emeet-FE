@@ -13,13 +13,6 @@ type BookingRoute = Route<"/booking/[id]">;
 type SignUpRoute = Route<"/signup">;
 type CategoryRoute = Route<"/category/[slug]">;
 
-type AppRoute =
-  | ExpertsRoute
-  | ExpertDetailRoute
-  | BookingRoute
-  | SignUpRoute
-  | CategoryRoute;
-
 export default function HomePage() {
   // In a real application, this would be fetched from an API
   const experts = [
