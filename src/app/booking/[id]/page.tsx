@@ -56,13 +56,7 @@ const getExpertById = (id: string) => {
   };
 };
 
-interface PageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function BookingPage({ params }: PageProps) {
+export default async function Page({ params }: { params: { id: string } }) {
   const expert = getExpertById(params.id);
 
   return (
