@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export interface LoginFormData {
   username: string;
@@ -20,14 +20,14 @@ export const useLoginForm = (
   });
   const [isFormValid, setIsFormValid] = useState(false);
 
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     const newErrors: LoginFormErrors = {
       username: !formData.username ? "Vui lòng nhập username/email" : "",
       password: !formData.password ? "Vui lòng nhập mật khẩu" : "",
     };
     setFormErrors(newErrors);
     setIsFormValid(!newErrors.username && !newErrors.password);
-  };
+  }, [formData]);
 
   useEffect(() => {
     validateForm();

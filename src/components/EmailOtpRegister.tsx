@@ -115,8 +115,8 @@ const EmailOtpRegister: React.FC<EmailOtpRegisterProps> = ({
   };
 
   // Allow Enter key to submit OTP
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && step === "otp") handleCheckOtp();
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter" && step === "otp") handleCheckOtp();
   };
 
   return (

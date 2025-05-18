@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 // Email validation function
 export const validateGmail = (email: string): string => {
@@ -99,7 +99,7 @@ export const useAuthForm = (
   const [isFormValid, setIsFormValid] = useState(false);
 
   // Validate the entire form
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     const newErrors: AuthFormErrors = {
       username: validateUsername(formData.username),
       email: validateGmail(formData.email),
@@ -129,7 +129,7 @@ export const useAuthForm = (
           (formData.experience && formData.pricePerMinute > 0))
       )
     );
-  };
+  }, [formData]);
 
   // Validate form when input changes
   useEffect(() => {

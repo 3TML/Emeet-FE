@@ -82,7 +82,7 @@ export async function fetchWithRetry<T>(
 
       try {
         return JSON.parse(text);
-      } catch (e) {
+      } catch {
         throw new Error("Invalid JSON response from server");
       }
     } catch (error) {
