@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import type { Route } from "next";
 import Link from "next/link";
 import { ArrowRight, Star, Calendar, Search, Filter } from "lucide-react";
