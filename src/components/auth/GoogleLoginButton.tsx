@@ -42,7 +42,8 @@ const GoogleLoginButton = () => {
       } else {
         router.push("/dashboard/user");
       }
-    } catch {
+    } catch (error) {
+      console.error("Google login error:", error);
       toast.error("Đăng nhập Google thất bại. Vui lòng thử lại.");
     }
   };
@@ -51,13 +52,11 @@ const GoogleLoginButton = () => {
     <div className="w-full flex items-center justify-center">
       <GoogleLogin
         onSuccess={handleGoogleLogin}
-        onError={() =>
-          toast.error(
-            "Google login was cancelled or blocked. Please try again."
-          )
-        }
+        onError={() => {
+          console.error("Google login error");
+          toast.error("Google login failed. Please try again.");
+        }}
         width="100%"
-        useOneTap
         text="signin_with"
         shape="rectangular"
         theme="outline"
