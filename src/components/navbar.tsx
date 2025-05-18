@@ -23,12 +23,6 @@ interface NavLinkProps {
   onClick?: () => void;
 }
 
-interface NavLinkItem {
-  href: { pathname: AppRoute };
-  label: string;
-  className?: string;
-}
-
 // Constants
 const ANIMATION_CONFIG = {
   duration: 0.5,
