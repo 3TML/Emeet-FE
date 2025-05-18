@@ -172,7 +172,7 @@ export default async function BookingPage({
                   {/* Summary */}
                   <div className="border rounded p-4 text-sm text-gray-700 bg-gray-50">
                     <p>
-                      You're booking <strong>{expert.name}</strong> for a{" "}
+                      You&apos;re booking <strong>{expert.name}</strong> for a{" "}
                       <strong>{expert.services[0].name}</strong> session on{" "}
                       <strong>{expert.availability[0].date}</strong> at{" "}
                       <strong>{expert.availability[0].slots[0]}</strong>.
