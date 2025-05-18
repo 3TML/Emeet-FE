@@ -44,6 +44,11 @@ const SLIDES = [
   },
 ];
 
+type LoginUserResponse = {
+  role: string;
+  [key: string]: unknown;
+};
+
 const LoginPage = () => {
   // Slideshow state
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -64,10 +69,7 @@ const LoginPage = () => {
 
     try {
       setIsLoading(true);
-      const response = (await loginUserApi(formData)) as {
-        role: string;
-        [key: string]: any;
-      };
+      const response = (await loginUserApi(formData)) as LoginUserResponse;
       localStorage.setItem("user", JSON.stringify(response));
       toast.success("Đăng nhập thành công!");
       const role = (response.role || "").toLowerCase();

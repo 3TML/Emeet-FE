@@ -7,7 +7,7 @@ const API_URL =
 
 type GoogleLoginResponse = {
   role: string;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 const loginWithGoogleApi = async (

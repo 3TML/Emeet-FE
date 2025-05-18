@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Clock, Calendar, DollarSign, Star, Check } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const getExpertById = (id: string) => {
   return {
@@ -66,9 +67,11 @@ export default function BookingPage({ params }: { params: { id: string } }) {
             <Card>
               <CardContent className="p-6">
                 <div className="flex flex-col items-center text-center">
-                  <img
+                  <Image
                     src={expert.image}
                     alt={expert.name}
+                    width={128}
+                    height={128}
                     className="w-32 h-32 rounded-full object-cover mb-4"
                   />
                   <h2 className="text-xl font-bold mb-1">{expert.name}</h2>

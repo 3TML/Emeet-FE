@@ -2,8 +2,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Calendar, DollarSign, Star, User } from "lucide-react";
-import { motion } from "framer-motion";
+import { Calendar, DollarSign, Star, User } from "lucide-react";
 
 const stats = [
   {
@@ -48,7 +47,7 @@ export default function ExpertDashboard() {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const role = (user.role || "").toLowerCase();
     if (role !== "expert") {
-      router.push("/login" as any);
+      router.push("/login");
     }
   }, [router]);
 

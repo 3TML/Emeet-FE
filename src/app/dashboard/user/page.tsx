@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Calendar, MessageSquare, User } from "lucide-react";
-import { motion } from "framer-motion";
 
 const stats = [
   {
@@ -55,7 +54,7 @@ export default function UserDashboard() {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const role = (user.role || "").toLowerCase();
     if (role !== "user") {
-      router.push("/login" as any);
+      router.push("/login");
     }
   }, [router]);
 

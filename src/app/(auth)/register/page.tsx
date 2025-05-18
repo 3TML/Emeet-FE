@@ -441,8 +441,8 @@ const RegisterPage = () => {
                     transition={{ duration: 0.3 }}
                   >
                     <p className="text-xs text-gray-500">
-                      As an expert, you'll be able to offer your expertise to
-                      others and set your own rates.
+                      As an expert, you&apos;ll be able to offer your expertise
+                      to others and set your own rates.
                     </p>
                     <div className="space-y-4">
                       {/* Expertise Category */}

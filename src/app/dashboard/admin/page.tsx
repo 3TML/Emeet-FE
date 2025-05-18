@@ -9,7 +9,6 @@ import {
   UserCheck,
   AlertTriangle,
 } from "lucide-react";
-import { motion } from "framer-motion";
 
 const stats = [
   {
@@ -61,7 +60,7 @@ export default function AdminDashboard() {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const role = (user.role || "").toLowerCase();
     if (role !== "admin") {
-      router.push("/login" as any);
+      router.push("/login");
     }
   }, [router]);
 
