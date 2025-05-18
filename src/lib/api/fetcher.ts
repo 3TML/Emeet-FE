@@ -154,7 +154,7 @@ export function apiGet<T>(url: string, options: FetchOptions = {}): Promise<T> {
  */
 export function apiPost<T>(
   url: string,
-  data: any,
+  data: unknown,
   options: FetchOptions = {}
 ): Promise<T> {
   return fetchWithRetry<T>(url, {

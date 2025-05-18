@@ -386,9 +386,9 @@ export default function HomePage() {
                 <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
               </div>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                "The expert I consulted provided invaluable insights that helped
-                me navigate a complex business decision. Well worth the
-                investment!"
+                &quot;The expert I consulted provided invaluable insights that
+                helped me navigate a complex business decision. Well worth the
+                investment!&quot;
               </p>
               <div className="flex items-center">
                 <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 overflow-hidden mr-3">
@@ -418,9 +418,9 @@ export default function HomePage() {
                 <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
               </div>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                "I've booked multiple sessions with different experts, and each
-                one has been incredibly helpful. The platform is easy to use and
-                the experts are top-notch."
+                &quot;I've booked multiple sessions with different experts, and
+                each one has been incredibly helpful. The platform is easy to
+                use and the experts are top-notch.&quot;
               </p>
               <div className="flex items-center">
                 <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 overflow-hidden mr-3">
@@ -450,9 +450,9 @@ export default function HomePage() {
                 <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
               </div>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                "As someone just starting out in my field, the guidance I
+                &quot;As someone just starting out in my field, the guidance I
                 received was incredible. My expert was patient, knowledgeable,
-                and genuinely invested in my success."
+                and genuinely invested in my success.&quot;
               </p>
               <div className="flex items-center">
                 <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 overflow-hidden mr-3">
