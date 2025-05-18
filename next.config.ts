@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    domains: ["i.pravatar.cc"],
+    domains: ["i.pravatar.cc", "lh3.googleusercontent.com", "i.imgur.com"],
   },
 };
 

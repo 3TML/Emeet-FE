@@ -1,8 +1,7 @@
 import { ReactNode } from "react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-const GOOGLE_CLIENT_ID =
-  "246730582795-bldqe5o18il9nt127q03d8penomg7b9t.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 type GoogleOAuthProviderWrapperProps = {
   children: ReactNode;
@@ -11,7 +10,7 @@ type GoogleOAuthProviderWrapperProps = {
 const GoogleOAuthProviderWrapper = ({
   children,
 }: GoogleOAuthProviderWrapperProps) => (
-  <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+  <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID as string}>
     {children}
   </GoogleOAuthProvider>
 );
