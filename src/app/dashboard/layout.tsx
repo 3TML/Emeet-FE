@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import type { Route } from "next";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard,
@@ -18,29 +19,45 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-// Navigation items
+// Define route types
+type DashboardRoute = Route<"/dashboard">;
+type UsersRoute = Route<"/dashboard/users">;
+type CalendarRoute = Route<"/dashboard/calendar">;
+type SettingsRoute = Route<"/dashboard/settings">;
+type ProfileRoute = Route<"/dashboard/profile">;
+type LoginRoute = Route<"/login">;
+
+type AppRoute =
+  | DashboardRoute
+  | UsersRoute
+  | CalendarRoute
+  | SettingsRoute
+  | ProfileRoute
+  | LoginRoute;
+
+// Navigation items with proper typing
 const navItems = [
   {
     title: "Dashboard",
-    href: "/dashboard",
+    href: "/dashboard" as DashboardRoute,
     icon: LayoutDashboard,
   },
   {
     title: "Users",
-    href: "/dashboard/users",
+    href: "/dashboard/users" as UsersRoute,
     icon: Users,
   },
   {
     title: "Calendar",
-    href: "/dashboard/calendar",
+    href: "/dashboard/calendar" as CalendarRoute,
     icon: Calendar,
   },
   {
     title: "Settings",
-    href: "/dashboard/settings",
+    href: "/dashboard/settings" as SettingsRoute,
     icon: Settings,
   },
-];
+] as const;
 
 export default function DashboardLayout({
   children,
@@ -75,7 +92,7 @@ export default function DashboardLayout({
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    router.push("/login");
+    router.push("/login" as LoginRoute);
     toast.success("Đăng xuất thành công");
   };
 
@@ -123,7 +140,7 @@ export default function DashboardLayout({
                       ? "bg-gray-100 dark:bg-gray-700 text-primary"
                       : "hover:bg-gray-100 dark:hover:bg-gray-700"
                   )}
-                  onClick={() => router.push(item.href)}
+                  onClick={() => router.push(item.href as AppRoute)}
                 >
                   <item.icon size={20} />
                   {item.title}
@@ -174,7 +191,9 @@ export default function DashboardLayout({
                 variant="ghost"
                 size="icon"
                 aria-label="Profile"
-                onClick={() => router.push("/dashboard/profile")}
+                onClick={() =>
+                  router.push("/dashboard/profile" as ProfileRoute)
+                }
               >
                 <User size={20} />
               </Button>
