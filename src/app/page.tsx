@@ -371,8 +371,8 @@ export default function HomePage() {
               What Our Users Say
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
-              Don't just take our word for it - hear from some of our satisfied
-              users
+              Don&apos;t just take our word for it - hear from some of our
+              satisfied users
             </p>
           </div>
 
@@ -418,9 +418,9 @@ export default function HomePage() {
                 <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
               </div>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                &quot;I've booked multiple sessions with different experts, and
-                each one has been incredibly helpful. The platform is easy to
-                use and the experts are top-notch.&quot;
+                &quot;I&apos;ve booked multiple sessions with different experts,
+                and each one has been incredibly helpful. The platform is easy
+                to use and the experts are top-notch.&quot;
               </p>
               <div className="flex items-center">
                 <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 overflow-hidden mr-3">

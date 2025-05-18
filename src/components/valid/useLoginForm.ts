@@ -20,10 +20,6 @@ export const useLoginForm = (
   });
   const [isFormValid, setIsFormValid] = useState(false);
 
-  useEffect(() => {
-    validateForm();
-  }, [formData]);
-
   const validateForm = () => {
     const newErrors: LoginFormErrors = {
       username: !formData.username ? "Vui lòng nhập username/email" : "",
@@ -32,6 +28,10 @@ export const useLoginForm = (
     setFormErrors(newErrors);
     setIsFormValid(!newErrors.username && !newErrors.password);
   };
+
+  useEffect(() => {
+    validateForm();
+  }, [formData, validateForm]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

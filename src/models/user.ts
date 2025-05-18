@@ -4,5 +4,3 @@ export type User = {
   email: string;
   password: string;
 };
-
-import { registerUserApi } from "@/lib/api/user";

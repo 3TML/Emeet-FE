@@ -169,7 +169,7 @@ export function apiPost<T>(
  */
 export function apiPut<T>(
   url: string,
-  data: any,
+  data: unknown,
   options: FetchOptions = {}
 ): Promise<T> {
   return fetchWithRetry<T>(url, {

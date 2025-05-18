@@ -98,11 +98,6 @@ export const useAuthForm = (
   });
   const [isFormValid, setIsFormValid] = useState(false);
 
-  // Validate form when input changes
-  useEffect(() => {
-    validateForm();
-  }, [formData]);
-
   // Validate the entire form
   const validateForm = () => {
     const newErrors: AuthFormErrors = {
@@ -135,6 +130,11 @@ export const useAuthForm = (
       )
     );
   };
+
+  // Validate form when input changes
+  useEffect(() => {
+    validateForm();
+  }, [formData, validateForm]);
 
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
