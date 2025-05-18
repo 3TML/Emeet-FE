@@ -8,7 +8,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Star, Clock } from "lucide-react";
+import { Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -172,7 +172,7 @@ export default async function BookingPage({
                   {/* Summary */}
                   <div className="border rounded p-4 text-sm text-gray-700 bg-gray-50">
                     <p>
-                      You’re booking <strong>{expert.name}</strong> for a{" "}
+                      You're booking <strong>{expert.name}</strong> for a{" "}
                       <strong>{expert.services[0].name}</strong> session on{" "}
                       <strong>{expert.availability[0].date}</strong> at{" "}
                       <strong>{expert.availability[0].slots[0]}</strong>.
