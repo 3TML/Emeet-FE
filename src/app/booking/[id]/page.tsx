@@ -60,10 +60,9 @@ interface PageProps {
   params: {
     id: string;
   };
-  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-export default function BookingPage({ params, searchParams }: PageProps) {
+export default function BookingPage({ params }: PageProps) {
   const expert = getExpertById(params.id);
 
   return (
