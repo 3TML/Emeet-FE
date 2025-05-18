@@ -81,7 +81,6 @@ const EmailOtpRegister: React.FC<EmailOtpRegisterProps> = ({
       }
     };
     checkEmail();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, fullName]);
 
   // Handle OTP check
