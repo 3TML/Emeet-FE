@@ -1,4 +1,4 @@
-import { LoginForm, RegisterForm } from "@/types/user";
+import { LoginForm, LoginGoogleForm, RegisterForm } from "@/types/user";
 import { apiGet, apiPost } from "./fetcher";
 
 const BASE_URL = "https://emeet.gahonghac.net/api/v1";
@@ -42,5 +42,15 @@ export const getCategoryApi = async () => {
   } catch (error) {
     console.error("Error fetching categories:", error);
     return [];
+  }
+};
+
+
+export const loginGoogleApi = async (form: LoginGoogleForm) => {
+  try {
+    return await apiPost(`${BASE_URL}/auth/LoginGoogle`, form);
+  } catch (error) {
+    console.error("Error login user:", error);
+    throw error;
   }
 };

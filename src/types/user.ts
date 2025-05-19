@@ -22,3 +22,9 @@ export type Category = {
   dateCreated: Date;
   dateUpdated: Date;
 };
+
+
+export type LoginGoogleForm = {
+  idToken: string;
+};
+

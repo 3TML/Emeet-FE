@@ -27,7 +27,7 @@ const navItems = [
   },
   {
     title: "Users",
-    href: "/dashboard/users",
+    href: "/user/users",
     icon: Users,
   },
   {
