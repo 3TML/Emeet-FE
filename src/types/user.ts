@@ -7,7 +7,6 @@ export type RegisterForm = {
   isExpert: boolean;
   listCategoryId: string[];
   experience: string;
-  pricePerMinute: number;
 };
 
 export type LoginForm = {
