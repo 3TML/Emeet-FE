@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import EmailOtpRegister from "@/components/EmailOtpRegister";
 import Image from "next/image";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Slide data for registration
 const SLIDES = [
@@ -54,7 +55,7 @@ const RegisterPage = () => {
   // Form specific state
   const [isExpert, setIsExpert] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [expertise, setExpertise] = useState("");
+  const [expertise, setExpertise] = useState<string[]>([]);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
@@ -92,7 +93,7 @@ const RegisterPage = () => {
       isFormValid &&
       !confirmPasswordError &&
       termsAccepted &&
-      (!isExpert || expertise)
+      (!isExpert || expertise.length > 0)
     );
   };
 
@@ -174,7 +175,7 @@ const RegisterPage = () => {
         role: isExpert ? "EXPERT" : "USER",
         gender: formData.gender,
         isExpert: isExpert,
-        listCategoryId: isExpert && expertise ? [expertise] : [],
+        listCategoryId: isExpert && expertise.length > 0 ? expertise : [],
         experience: isExpert ? formData.experience : "",
         pricePerMinute: isExpert ? formData.pricePerMinute : 0,
       };
@@ -453,33 +454,34 @@ const RegisterPage = () => {
                         >
                           Area of Expertise
                         </label>
-                        <select
-                          id="expertise"
-                          value={expertise}
-                          onChange={(e) => setExpertise(e.target.value)}
-                          className="w-full h-11 rounded-lg border border-input bg-background px-3 text-sm"
-                          required={isExpert}
-                          disabled={isLoadingCategories}
-                        >
-                          <option value="">
-                            Select your area of expertise
-                          </option>
-                          {isLoadingCategories ? (
-                            <option value="" disabled>
-                              Loading categories...
-                            </option>
-                          ) : categoryError ? (
-                            <option value="" disabled>
-                              {categoryError}
-                            </option>
-                          ) : (
-                            categories.map((category) => (
-                              <option key={category.id} value={category.id}>
-                                {category.name}
-                              </option>
-                            ))
-                          )}
-                        </select>
+                        <p className="text-xs text-gray-500 mb-1">
+                          (Giữ Ctrl hoặc Cmd để chọn nhiều lĩnh vực)
+                        </p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {categories.map((category) => (
+                            <label
+                              key={category.id}
+                              className="flex items-center gap-2 p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:shadow transition cursor-pointer"
+                            >
+                              <Checkbox
+                                checked={expertise.includes(category.id)}
+                                onCheckedChange={(checked: boolean) => {
+                                  if (checked) {
+                                    setExpertise([...expertise, category.id]);
+                                  } else {
+                                    setExpertise(
+                                      expertise.filter(
+                                        (id) => id !== category.id
+                                      )
+                                    );
+                                  }
+                                }}
+                                id={`cat-${category.id}`}
+                              />
+                              <span className="text-sm">{category.name}</span>
+                            </label>
+                          ))}
+                        </div>
                       </div>
 
                       {/* Experience */}

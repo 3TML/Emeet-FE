@@ -22,3 +22,15 @@ export type Category = {
   dateCreated: Date;
   dateUpdated: Date;
 };
+
+export type User = {
+  id: string;
+  email: string;
+  fullName: string;
+  avatar?: string;
+  role: string;
+  refreshToken: string;
+  accessToken?: string;
+  status?: string;
+  [key: string]: any;
+};

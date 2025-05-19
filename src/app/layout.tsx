@@ -7,6 +7,8 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ThemeProvider } from "@/providers/theme-provider";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import { UserProvider } from "@/providers/UserProvider";
+import AuthWrapper from "@/components/AuthWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,12 +50,16 @@ export default function RootLayout({
             enableSystem={false}
             disableTransitionOnChange
           >
-            <div className="flex min-h-screen flex-col">
-              <Navbar />
-              <main className="flex-grow pt-16">{children}</main>
-              <Footer />
-            </div>
-            <Toaster position="top-center" richColors />
+            <UserProvider>
+              <AuthWrapper>
+                <div className="flex min-h-screen flex-col">
+                  <Navbar />
+                  <main className="flex-grow pt-16">{children}</main>
+                  <Footer />
+                </div>
+                <Toaster position="top-center" richColors />
+              </AuthWrapper>
+            </UserProvider>
           </ThemeProvider>
         </GoogleOAuthProvider>
       </body>

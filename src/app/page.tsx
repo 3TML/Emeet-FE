@@ -5,6 +5,13 @@ import Link from "next/link";
 import { ArrowRight, Star, Calendar, Search, Filter } from "lucide-react";
 import LazyImage from "@/components/ui/lazy-image";
 import LazySection from "@/components/ui/lazy-section";
+import { useEffect, useState } from "react";
+import {
+  getSugestionExperts,
+  getExpertByNameAndCategory,
+} from "@/lib/api/expertApi";
+import { getCategoryApi } from "@/lib/api/user";
+import type { Category } from "@/types/user";
 
 // Define route types
 type ExpertsRoute = Route<"/experts">;
@@ -13,111 +20,75 @@ type BookingRoute = Route<"/booking/[id]">;
 type SignUpRoute = Route<"/signup">;
 type CategoryRoute = Route<"/category/[slug]">;
 
-export default function HomePage() {
-  // In a real application, this would be fetched from an API
-  const experts = [
-    {
-      id: 1,
-      name: "Dr. Emily Chen",
-      specialty: "Business Strategy",
-      bio: "Over 15 years of experience helping businesses optimize their strategies for growth and sustainability.",
-      rating: 4.9,
-      ratingCount: 127,
-      price: "$150/hour",
-      availability: "Available next week",
-      image: "https://i.pravatar.cc/150?img=1",
-    },
-    {
-      id: 2,
-      name: "Prof. Michael Johnson",
-      specialty: "Marketing Consultant",
-      bio: "Former CMO at Fortune 500 companies with expertise in digital marketing transformation and brand strategy.",
-      rating: 4.8,
-      ratingCount: 94,
-      price: "$175/hour",
-      availability: "Available today",
-      image: "https://i.pravatar.cc/150?img=3",
-    },
-    {
-      id: 3,
-      name: "Dr. Sarah Williams",
-      specialty: "Financial Advisor",
-      bio: "Specialized in personal and business finance optimization, investment strategy, and financial planning.",
-      rating: 4.9,
-      ratingCount: 156,
-      price: "$185/hour",
-      availability: "Available tomorrow",
-      image: "https://i.pravatar.cc/150?img=5",
-    },
-    {
-      id: 4,
-      name: "James Rodriguez, MBA",
-      specialty: "Startup Consultant",
-      bio: "Helped over 40 startups secure funding and scale operations. Expert in lean startup methodology.",
-      rating: 4.7,
-      ratingCount: 72,
-      price: "$140/hour",
-      availability: "Limited availability",
-      image: "https://i.pravatar.cc/150?img=8",
-    },
-    {
-      id: 5,
-      name: "Dr. Lisa Thompson",
-      specialty: "Leadership Coach",
-      bio: "Executive coach with experience working with C-suite executives at leading tech and finance companies.",
-      rating: 4.8,
-      ratingCount: 115,
-      price: "$200/hour",
-      availability: "Available next week",
-      image: "https://i.pravatar.cc/150?img=10",
-    },
-    {
-      id: 6,
-      name: "Robert Chang, PhD",
-      specialty: "Data Science",
-      bio: "Expert in machine learning, predictive analytics, and data-driven business strategy.",
-      rating: 4.9,
-      ratingCount: 89,
-      price: "$165/hour",
-      availability: "Available today",
-      image: "https://i.pravatar.cc/150?img=12",
-    },
-  ];
+type Expert = {
+  fullName: string;
+  gender: string;
+  avatar: string;
+  bio: string;
+  experience: string;
+  rate: number;
+  totalPreview: number;
+  listCategory: string[];
+};
 
-  const categories = [
-    {
-      name: "Business Strategy",
-      slug: "business-strategy",
-    },
-    {
-      name: "Marketing",
-      slug: "marketing",
-    },
-    {
-      name: "Finance",
-      slug: "finance",
-    },
-    {
-      name: "Leadership",
-      slug: "leadership",
-    },
-    {
-      name: "Data Science",
-      slug: "data-science",
-    },
-    {
-      name: "Product Management",
-      slug: "product-management",
-    },
-    {
-      name: "Software Development",
-      slug: "software-development",
-    },
-    {
-      name: "HR & Recruitment",
-      slug: "hr-recruitment",
-    },
-  ];
+export default function HomePage() {
+  const [experts, setExperts] = useState<Expert[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [expertList, categoryList] = await Promise.all([
+          getSugestionExperts(),
+          getCategoryApi(),
+        ]);
+        setExperts(expertList);
+        setCategories(categoryList as Category[]);
+      } catch (err) {
+        // handle error
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  const handleCategoryChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const value = e.target.value;
+    setSelectedCategory(value);
+    setLoading(true);
+    try {
+      if (value) {
+        const filtered = await getExpertByNameAndCategory("", value);
+        setExperts(filtered);
+      } else {
+        const all = await getSugestionExperts();
+        setExperts(all);
+      }
+    } catch (err) {
+      // handle error
+    }
+    setLoading(false);
+  };
+
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      const filtered = await getExpertByNameAndCategory(
+        searchText,
+        selectedCategory
+      );
+      setExperts(filtered);
+    } catch (err) {
+      // handle error
+    }
+    setLoading(false);
+  };
 
   const benefits = [
     {
@@ -212,19 +183,31 @@ export default function HomePage() {
                   <input
                     placeholder="Search by name, specialty, or keyword"
                     className="w-full pl-10 h-12 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-transparent"
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
                   />
                 </div>
                 <div className="w-full md:w-1/4">
-                  <select className="w-full h-12 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-transparent">
-                    <option value="">All Categories</option>
-                    {categories.map((category) => (
-                      <option key={category.slug} value={category.slug}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
+                  {categories.length > 0 && (
+                    <select
+                      className="w-full h-12 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-transparent"
+                      value={selectedCategory}
+                      onChange={handleCategoryChange}
+                    >
+                      <option value="">All Categories</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.name}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
-                <button className="h-12 px-5 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                <button
+                  className="h-12 px-5 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                  onClick={handleSearch}
+                  type="button"
+                >
                   <Search className="h-4 w-4" />
                   <span>Search</span>
                 </button>
@@ -284,75 +267,80 @@ export default function HomePage() {
               <span>Filter</span>
             </button>
           </div>
+          {loading ? (
+            <div className="text-center py-12 text-lg text-gray-500">
+              Loading experts...
+            </div>
+          ) : experts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {experts.map((expert) => (
+                <div
+                  key={expert.fullName}
+                  className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700"
+                >
+                  <div className="aspect-[4/3] relative">
+                    <LazyImage
+                      src={expert.avatar || "/default-avatar.png"}
+                      alt={expert.fullName || "Expert avatar"}
+                      className="w-full h-48 object-cover"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold mb-1 text-gray-900 dark:text-white">
+                      {expert.fullName || "No name"}
+                    </h3>
+                    <p className="text-primary dark:text-blue-400 font-medium mb-2">
+                      {expert.listCategory && expert.listCategory.length > 0
+                        ? expert.listCategory.join(", ")
+                        : "No specialty"}
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
+                      {expert.bio || "No bio"}
+                    </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {experts.map((expert) => (
-              <div
-                key={expert.id}
-                className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700"
-              >
-                <div className="aspect-[4/3] relative">
-                  <LazyImage
-                    src={expert.image}
-                    alt={expert.name}
-                    className="w-full h-48 object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-1 text-gray-900 dark:text-white">
-                    {expert.name}
-                  </h3>
-                  <p className="text-primary dark:text-blue-400 font-medium mb-2">
-                    {expert.specialty}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
-                    {expert.bio}
-                  </p>
-
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                      <span className="ml-1 text-sm font-medium">
-                        {expert.rating}
-                      </span>
-                      <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">
-                        ({expert.ratingCount})
-                      </span>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                        <span className="ml-1 text-sm font-medium">
+                          {expert.rate}
+                        </span>
+                        <span className="ml-1 text-xs text-gray-500 dark:text-gray-400">
+                          ({expert.totalPreview})
+                        </span>
+                      </div>
+                      <div className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                        {expert.experience || "-"}
+                      </div>
                     </div>
-                    <div className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                      {expert.price}
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <Link
+                        href={
+                          `/experts/${expert.fullName}` as ExpertDetailRoute
+                        }
+                        className="flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
+                      >
+                        View Profile
+                      </Link>
+                      <Link
+                        href={`/booking/${expert.fullName}` as BookingRoute}
+                        className="flex items-center justify-center h-10 px-4 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors text-sm font-medium"
+                      >
+                        Book Now
+                      </Link>
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-2 mb-4">
-                    <Calendar className="h-4 w-4 text-green-600 dark:text-green-500" />
-                    <span className="text-xs text-green-600 dark:text-green-500">
-                      {expert.availability}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <Link
-                      href={`/experts/${expert.id}` as ExpertDetailRoute}
-                      className="flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
-                    >
-                      View Profile
-                    </Link>
-                    <Link
-                      href={`/booking/${expert.id}` as BookingRoute}
-                      className="flex items-center justify-center h-10 px-4 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors text-sm font-medium"
-                    >
-                      Book Now
-                    </Link>
-                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-lg text-gray-500">
+              No experts found.
+            </div>
+          )}
           <div className="mt-12 text-center">
             <Link
-              href={"/experts" as ExpertsRoute}
+              href={"/experts" as Route}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
             >
               View All Experts
@@ -379,8 +367,8 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
             {categories.map((category) => (
               <Link
-                href={`/category/${category.slug}` as CategoryRoute}
-                key={category.slug}
+                href={`/category/${category.id}` as CategoryRoute}
+                key={category.id}
                 className="flex items-center justify-center h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
               >
                 {category.name}
