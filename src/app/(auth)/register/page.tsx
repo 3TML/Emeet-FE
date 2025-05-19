@@ -177,7 +177,6 @@ const RegisterPage = () => {
         isExpert: isExpert,
         listCategoryId: isExpert && expertise.length > 0 ? expertise : [],
         experience: isExpert ? formData.experience : "",
-        pricePerMinute: isExpert ? formData.pricePerMinute : 0,
       };
       console.log("Registering user with data:", userData);
       const response = await registerUserApi(userData);
@@ -511,41 +510,6 @@ const RegisterPage = () => {
                           <div className="flex items-center mt-1 text-xs text-red-500">
                             <AlertCircle size={12} className="mr-1" />
                             Please enter your experience
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Price per Minute */}
-                      <div className="space-y-2">
-                        <label
-                          htmlFor="pricePerMinute"
-                          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                          Price per Minute (USD)
-                        </label>
-                        <Input
-                          id="pricePerMinute"
-                          name="pricePerMinute"
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={formData.pricePerMinute}
-                          onChange={handleInputChange}
-                          placeholder="0.00"
-                          className={`w-full h-11 rounded-lg ${
-                            isExpert && formData.pricePerMinute <= 0
-                              ? "border-red-500 focus-visible:ring-red-500"
-                              : "border-gray-300"
-                          }`}
-                          required={isExpert}
-                          aria-invalid={
-                            isExpert && formData.pricePerMinute <= 0
-                          }
-                        />
-                        {isExpert && formData.pricePerMinute <= 0 && (
-                          <div className="flex items-center mt-1 text-xs text-red-500">
-                            <AlertCircle size={12} className="mr-1" />
-                            Please enter a valid price per minute
                           </div>
                         )}
                       </div>
