@@ -21,7 +21,6 @@ import EmailOtpRegister from "@/components/EmailOtpRegister";
 import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox";
 
-// Slide data for registration
 const SLIDES = [
   {
     image: "https://i.imgur.com/0y8Ftya.jpg",
@@ -169,7 +168,7 @@ const RegisterPage = () => {
     setIsLoading(true);
     try {
       const userData: RegisterForm = {
-        username: formData.username, // This is actually the email
+        username: formData.username,
         password: formData.password,
         fullName: formData.fullName,
         role: isExpert ? "EXPERT" : "USER",
@@ -453,9 +452,6 @@ const RegisterPage = () => {
                         >
                           Area of Expertise
                         </label>
-                        <p className="text-xs text-gray-500 mb-1">
-                          (Giữ Ctrl hoặc Cmd để chọn nhiều lĩnh vực)
-                        </p>
                         <div className="grid grid-cols-2 gap-2">
                           {categories.map((category) => (
                             <label

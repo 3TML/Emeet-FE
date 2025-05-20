@@ -22,15 +22,6 @@ export const loginUserApi = async (form: LoginForm) => {
   }
 };
 
-export const getUsersApi = async () => {
-  try {
-    return await apiGet("/api/register");
-  } catch (error) {
-    console.error("Error getting users:", error);
-    throw error;
-  }
-};
-
 export const getCategoryApi = async () => {
   try {
     return await apiGet(`${API_URL}/category/GetAll`, {
