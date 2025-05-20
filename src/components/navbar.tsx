@@ -9,8 +9,8 @@ import { Sun, Moon, Menu, X } from "lucide-react";
 // Types
 type AppRoute =
   | "/"
-  | "/experts"
-  | "/how-it-works"
+  | "/find"
+  | "/work"
   | "/pricing"
   | "/about"
   | "/login"
@@ -30,8 +30,8 @@ const ANIMATION_CONFIG = {
 } as const;
 
 const navLinks = [
-  { href: { pathname: "/experts" }, label: "Find Experts" },
-  { href: { pathname: "/how-it-works" }, label: "How It Works" },
+  { href: { pathname: "/find" }, label: "Find Experts" },
+  { href: { pathname: "/work" }, label: "Work" },
   { href: { pathname: "/pricing" }, label: "Pricing" },
   { href: { pathname: "/about" }, label: "About Us" },
 ] as const;
