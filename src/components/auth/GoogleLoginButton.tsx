@@ -40,7 +40,7 @@ const GoogleLoginButton = () => {
       } else if (role === "expert") {
         router.push("/dashboard/expert");
       } else {
-        router.push("/dashboard/user");
+        router.push("/user/home");
       }
     } catch (error) {
       console.error("Google login error:", error);

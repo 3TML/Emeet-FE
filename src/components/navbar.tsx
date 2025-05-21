@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sun, Moon, Menu, X } from "lucide-react";
 
@@ -142,11 +143,13 @@ const MobileMenu = ({
   </AnimatePresence>
 );
 
-export default function Navbar() {
+const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -157,6 +160,36 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Đồng bộ trạng thái user
+  useEffect(() => {
+    const syncUser = () => {
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        try {
+          setUser(JSON.parse(stored));
+        } catch {
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    };
+    syncUser();
+    window.addEventListener("storage", syncUser);
+    window.addEventListener("userChanged", syncUser);
+    return () => {
+      window.removeEventListener("storage", syncUser);
+      window.removeEventListener("userChanged", syncUser);
+    };
+  }, []);
+
+  const handleSignOut = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    window.dispatchEvent(new Event("userChanged"));
+    router.push("/login");
+  };
 
   return (
     <motion.header
@@ -201,14 +234,40 @@ export default function Navbar() {
                 mounted && setTheme(theme === "dark" ? "light" : "dark")
               }
             />
-            {authLinks.map(({ href, label, className }) => (
-              <NavLink
-                key={href.pathname}
-                href={href}
-                label={label}
-                className={className ?? ""}
-              />
-            ))}
+            {user ? (
+              <>
+                <Link href="/profile" aria-label="Hồ sơ cá nhân" tabIndex={0}>
+                  <span className="flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-blue-700 font-semibold hover:bg-blue-200">
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt="avatar"
+                        className="w-7 h-7 rounded-full object-cover border border-blue-200"
+                      />
+                    ) : null}
+                    {user.fullName || "Hồ sơ"}
+                  </span>
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="ml-2 px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 font-medium focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  tabIndex={0}
+                  aria-label="Đăng xuất"
+                  type="button"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              authLinks.map(({ href, label, className }) => (
+                <NavLink
+                  key={href.pathname}
+                  href={href}
+                  label={label}
+                  className={className ?? ""}
+                />
+              ))
+            )}
           </div>
 
           <div className="flex items-center md:hidden">
@@ -230,4 +289,6 @@ export default function Navbar() {
       <MobileMenu isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </motion.header>
   );
-}
+};
+
+export default Navbar;

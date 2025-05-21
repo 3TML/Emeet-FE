@@ -78,7 +78,7 @@ const LoginPage = () => {
       } else if (role === "expert") {
         router.push("/dashboard/expert");
       } else {
-        router.push("/dashboard/user");
+        router.push("/user/home");
       }
     } catch (error) {
       console.error("Login failed:", error);

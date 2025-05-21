@@ -44,7 +44,7 @@ const navItems = [
   },
   {
     title: "Users",
-    href: "/dashboard/users" as UsersRoute,
+    href: "/user/home" as UsersRoute,
     icon: Users,
   },
   {
