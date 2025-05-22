@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   Users,
-  Calendar,
+
   Settings,
   LogOut,
   Menu,
@@ -22,7 +22,7 @@ import { toast } from "sonner";
 // Define route types
 type DashboardRoute = Route<"/dashboard">;
 type UsersRoute = Route<"/dashboard/users">;
-type CalendarRoute = Route<"/dashboard/calendar">;
+
 type SettingsRoute = Route<"/dashboard/settings">;
 type ProfileRoute = Route<"/dashboard/profile">;
 type LoginRoute = Route<"/login">;
@@ -30,7 +30,7 @@ type LoginRoute = Route<"/login">;
 type AppRoute =
   | DashboardRoute
   | UsersRoute
-  | CalendarRoute
+
   | SettingsRoute
   | ProfileRoute
   | LoginRoute;
@@ -47,17 +47,22 @@ const navItems = [
     href: "/user/home" as UsersRoute,
     icon: Users,
   },
-  {
-    title: "Calendar",
-    href: "/dashboard/calendar" as CalendarRoute,
-    icon: Calendar,
-  },
+
   {
     title: "Settings",
     href: "/dashboard/settings" as SettingsRoute,
     icon: Settings,
   },
 ] as const;
+
+const expertMenu = [
+  { title: "Lịch làm việc", href: "/dashboard/expert/schedule", icon: "🗓️" },
+  { title: "Thiết lập giá", href: "/dashboard/expert/pricing", icon: "🪙" },
+  { title: "Đơn hẹn", href: "/dashboard/expert/appointments", icon: "📅" },
+  { title: "Link cuộc gọi", href: "/dashboard/expert/call-link", icon: "📞" },
+  { title: "Đánh giá & phản hồi", href: "/dashboard/expert/reviews", icon: "⭐" },
+  { title: "Thu nhập", href: "/dashboard/expert/income", icon: "🪴" },
+];
 
 export default function DashboardLayout({
   children,
@@ -68,6 +73,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
 
   // Check authentication
   useEffect(() => {
@@ -75,6 +81,12 @@ export default function DashboardLayout({
     if (!user) {
       router.push("/login");
       toast.error("Vui lòng đăng nhập để tiếp tục");
+    } else {
+      try {
+        setRole(JSON.parse(user).role?.toLowerCase() || null);
+      } catch {
+        setRole(null);
+      }
     }
   }, [router]);
 
@@ -147,6 +159,34 @@ export default function DashboardLayout({
                 </Button>
               );
             })}
+
+            {/* Hiển thị expert menu nếu role là expert */}
+            {role === "expert" && (
+              <>
+                <div className="mt-6 mb-2 px-2 text-xs font-semibold text-gray-400 uppercase">
+                  Chức năng chuyên gia
+                </div>
+                {expertMenu.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Button
+                      key={item.href}
+                      variant="ghost"
+                      className={cn(
+                        "w-full justify-start gap-3",
+                        isActive
+                          ? "bg-gray-100 dark:bg-gray-700 text-primary"
+                          : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                      )}
+                      onClick={() => router.push(item.href)}
+                    >
+                      <span className="text-lg">{item.icon}</span>
+                      {item.title}
+                    </Button>
+                  );
+                })}
+              </>
+            )}
           </nav>
 
           {/* Logout Button */}
