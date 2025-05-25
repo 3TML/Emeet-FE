@@ -7,7 +7,12 @@ import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   Users,
-
+  UserCheck,
+  FolderKanban,
+  CreditCard,
+  CalendarCheck2,
+  BarChart3,
+  AlertCircle,
   Settings,
   LogOut,
   Menu,
@@ -21,16 +26,26 @@ import { toast } from "sonner";
 
 // Define route types
 type DashboardRoute = Route<"/dashboard">;
-type UsersRoute = Route<"/dashboard/users">;
-
+type AdminDashboardRoute = Route<"/dashboard/admin">;
+type AdminUsersRoute = Route<"/dashboard/admin/users">;
+type AdminExpertsRoute = Route<"/dashboard/admin/experts">;
+type AdminCategoriesRoute = Route<"/dashboard/admin/categories">;
+type AdminTransactionsRoute = Route<"/dashboard/admin/transactions">;
+type AdminSchedulesRoute = Route<"/dashboard/admin/schedules">;
+type AdminReportsRoute = Route<"/dashboard/admin/reports">;
 type SettingsRoute = Route<"/dashboard/settings">;
 type ProfileRoute = Route<"/dashboard/profile">;
 type LoginRoute = Route<"/login">;
 
 type AppRoute =
   | DashboardRoute
-  | UsersRoute
-
+  | AdminDashboardRoute
+  | AdminUsersRoute
+  | AdminExpertsRoute
+  | AdminCategoriesRoute
+  | AdminTransactionsRoute
+  | AdminSchedulesRoute
+  | AdminReportsRoute
   | SettingsRoute
   | ProfileRoute
   | LoginRoute;
@@ -44,7 +59,7 @@ const navItems = [
   },
   {
     title: "Users",
-    href: "/user/home" as UsersRoute,
+    href: "/user/home" as AdminUsersRoute,
     icon: Users,
   },
 
@@ -60,8 +75,50 @@ const expertMenu = [
   { title: "Thiết lập giá", href: "/dashboard/expert/pricing", icon: "🪙" },
   { title: "Đơn hẹn", href: "/dashboard/expert/appointments", icon: "📅" },
   { title: "Link cuộc gọi", href: "/dashboard/expert/call-link", icon: "📞" },
-  { title: "Đánh giá & phản hồi", href: "/dashboard/expert/reviews", icon: "⭐" },
+  {
+    title: "Đánh giá & phản hồi",
+    href: "/dashboard/expert/reviews",
+    icon: "⭐",
+  },
   { title: "Thu nhập", href: "/dashboard/expert/income", icon: "🪴" },
+];
+
+const adminMenu = [
+  {
+    title: "Dashboard",
+    href: "/dashboard/admin" as AdminDashboardRoute,
+    icon: LayoutDashboard,
+  },
+  {
+    title: "User Management",
+    href: "/dashboard/admin/users" as AdminUsersRoute,
+    icon: Users,
+  },
+  {
+    title: "Expert Management",
+    href: "/dashboard/admin/experts" as AdminExpertsRoute,
+    icon: UserCheck,
+  },
+  {
+    title: "Skill Category Management",
+    href: "/dashboard/admin/categories" as AdminCategoriesRoute,
+    icon: FolderKanban,
+  },
+  {
+    title: "Transaction Management",
+    href: "/dashboard/admin/transactions" as AdminTransactionsRoute,
+    icon: CreditCard,
+  },
+  {
+    title: "Schedule Tracking",
+    href: "/dashboard/admin/schedules" as AdminSchedulesRoute,
+    icon: CalendarCheck2,
+  },
+  {
+    title: "Reports & Analytics",
+    href: "/dashboard/admin/reports" as AdminReportsRoute,
+    icon: BarChart3,
+  },
 ];
 
 export default function DashboardLayout({
@@ -126,7 +183,7 @@ export default function DashboardLayout({
           width: isSidebarOpen ? (isMobile ? "100%" : "280px") : "0px",
         }}
         className={cn(
-          "fixed top-0 left-0 h-full bg-white dark:bg-gray-800 shadow-lg z-40 transition-all duration-300",
+          "fixed top-0 left-0 h-[calc(100%-5px)] bg-white dark:bg-gray-800 shadow-lg z-40 transition-all duration-300",
           isMobile && !isSidebarOpen && "hidden"
         )}
       >
@@ -140,31 +197,39 @@ export default function DashboardLayout({
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-1">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Button
-                  key={item.href}
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start gap-3",
-                    isActive
-                      ? "bg-gray-100 dark:bg-gray-700 text-primary"
-                      : "hover:bg-gray-100 dark:hover:bg-gray-700"
-                  )}
-                  onClick={() => router.push(item.href as AppRoute)}
-                >
-                  <item.icon size={20} />
-                  {item.title}
-                </Button>
-              );
-            })}
+            {/* Hiển thị admin menu nếu role là admin */}
+            {role === "admin" && (
+              <>
+                <div className="mt-6 mb-2 px-2 text-xs font-semibold text-gray-400 uppercase">
+                  Admin Features
+                </div>
+                {adminMenu.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Button
+                      key={item.href}
+                      variant="ghost"
+                      className={cn(
+                        "w-full justify-start gap-3",
+                        isActive
+                          ? "bg-gray-100 dark:bg-gray-700 text-primary"
+                          : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                      )}
+                      onClick={() => router.push(item.href as AppRoute)}
+                    >
+                      <item.icon size={20} />
+                      {item.title}
+                    </Button>
+                  );
+                })}
+              </>
+            )}
 
             {/* Hiển thị expert menu nếu role là expert */}
             {role === "expert" && (
               <>
                 <div className="mt-6 mb-2 px-2 text-xs font-semibold text-gray-400 uppercase">
-                  Chức năng chuyên gia
+                  Expert Features
                 </div>
                 {expertMenu.map((item) => {
                   const isActive = pathname === item.href;
@@ -178,7 +243,7 @@ export default function DashboardLayout({
                           ? "bg-gray-100 dark:bg-gray-700 text-primary"
                           : "hover:bg-gray-100 dark:hover:bg-gray-700"
                       )}
-                      onClick={() => router.push(item.href)}
+                      onClick={() => router.push(item.href as AppRoute)}
                     >
                       <span className="text-lg">{item.icon}</span>
                       {item.title}

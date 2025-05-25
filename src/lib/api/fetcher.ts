@@ -6,6 +6,7 @@
  * - Automatic retries for network errors
  * - Timeout handling
  * - Response validation
+ * - CORS handling
  */
 
 const DEFAULT_TIMEOUT = 10000; // 10 seconds
@@ -16,6 +17,7 @@ export type FetchOptions = RequestInit & {
   timeout?: number;
   retries?: number;
   retryDelay?: number;
+  credentials?: RequestCredentials;
 };
 
 /**
@@ -29,6 +31,7 @@ export async function fetchWithRetry<T>(
     timeout = DEFAULT_TIMEOUT,
     retries = MAX_RETRIES,
     retryDelay = RETRY_DELAY,
+    credentials = "include", // Default to include credentials for CORS
     ...fetchOptions
   } = options;
 
@@ -49,12 +52,39 @@ export async function fetchWithRetry<T>(
       const response = await fetch(url, {
         ...fetchOptions,
         headers,
+        credentials, // Include credentials for CORS
         signal: controller.signal,
+        mode: "cors", // Explicitly set CORS mode
       });
 
+      // Handle different HTTP status codes
       if (!response.ok) {
-        const errorText = await response.text().catch(() => "Unknown error");
-        throw new Error(`HTTP error ${response.status}: ${errorText}`);
+        let errorMessage = `HTTP error ${response.status}`;
+        try {
+          const errorText = await response.text();
+          if (errorText) {
+            try {
+              const errorJson = JSON.parse(errorText);
+              errorMessage = errorJson.message || errorText;
+            } catch {
+              errorMessage = errorText;
+            }
+          }
+        } catch {
+          // If we can't read the error text, use the status text
+          errorMessage = response.statusText || errorMessage;
+        }
+
+        // Create a custom error with more details
+        const error = new Error(errorMessage) as Error & {
+          status?: number;
+          statusText?: string;
+          headers?: Headers;
+        };
+        error.status = response.status;
+        error.statusText = response.statusText;
+        error.headers = response.headers;
+        throw error;
       }
 
       return response;
@@ -77,13 +107,14 @@ export async function fetchWithRetry<T>(
       // Try to parse JSON, but handle empty responses gracefully
       const text = await response.text();
       if (!text) {
-        throw new Error("Empty response received from server");
+        return {} as T; // Return empty object for empty responses
       }
 
       try {
-        return JSON.parse(text);
-      } catch {
-        throw new Error("Invalid JSON response from server");
+        return JSON.parse(text) as T;
+      } catch (parseError) {
+        console.warn("Failed to parse JSON response:", parseError);
+        return text as unknown as T; // Return text if JSON parsing fails
       }
     } catch (error) {
       // Ensure we capture the full error information
@@ -95,19 +126,17 @@ export async function fetchWithRetry<T>(
         errorMessage: lastError.message,
         errorName: lastError.name,
         errorStack: lastError.stack,
-        status: error instanceof Response ? error.status : "unknown",
-        statusText: error instanceof Response ? error.statusText : "unknown",
-        headers:
-          error instanceof Response
-            ? Object.fromEntries(error.headers.entries())
-            : "unknown",
+        status: (error as any)?.status || "unknown",
+        statusText: (error as any)?.statusText || "unknown",
+        headers: (error as any)?.headers
+          ? Object.fromEntries((error as any).headers.entries())
+          : "unknown",
         attempt: attempt + 1,
         timestamp: new Date().toISOString(),
       };
 
       console.error("API Request Failed:", {
         ...errorDetails,
-        // Include the original error for debugging
         originalError: error,
       });
 
@@ -145,6 +174,7 @@ export async function fetchWithRetry<T>(
 export function apiGet<T>(url: string, options: FetchOptions = {}): Promise<T> {
   return fetchWithRetry<T>(url, {
     method: "GET",
+    credentials: "include", // Always include credentials for GET requests
     ...options,
   });
 }
@@ -159,6 +189,7 @@ export function apiPost<T>(
 ): Promise<T> {
   return fetchWithRetry<T>(url, {
     method: "POST",
+    credentials: "include", // Always include credentials for POST requests
     body: JSON.stringify(data),
     ...options,
   });
@@ -174,6 +205,7 @@ export function apiPut<T>(
 ): Promise<T> {
   return fetchWithRetry<T>(url, {
     method: "PUT",
+    credentials: "include", // Always include credentials for PUT requests
     body: JSON.stringify(data),
     ...options,
   });
@@ -188,6 +220,7 @@ export function apiDelete<T>(
 ): Promise<T> {
   return fetchWithRetry<T>(url, {
     method: "DELETE",
+    credentials: "include", // Always include credentials for DELETE requests
     ...options,
   });
 }
