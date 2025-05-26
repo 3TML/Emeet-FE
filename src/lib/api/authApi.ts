@@ -1,8 +1,10 @@
+import { fetchWithAuth } from "./fetcher";
+
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "https://emeet.gahonghac.net/api/v1";
 
 export const getAccessToken = async (refreshToken: string) => {
-  const res = await fetch(`${API_URL}/auth/GetAccessToken`, {
+  const res = await fetchWithAuth(`${API_URL}/auth/GetAccessToken`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ refreshToken }),
@@ -12,7 +14,7 @@ export const getAccessToken = async (refreshToken: string) => {
 };
 
 export const fetchUser = async (accessToken: string) => {
-  const res = await fetch(`${API_URL}/auth/FetchUser/${accessToken}`);
+  const res = await fetchWithAuth(`${API_URL}/auth/FetchUser/${accessToken}`);
   if (!res.ok) throw new Error("Cannot fetch user");
   return res.json(); // user data
 };
@@ -49,7 +51,7 @@ export const updateProfile = async (
       data.updateProfileRequest_PricePerMinute.toString()
     );
 
-  const res = await fetch(`${API_URL}/user/UpdateProfileWithId/${userId}`, {
+  const res = await fetchWithAuth(`${API_URL}/user/UpdateProfileWithId/${userId}`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -60,3 +62,16 @@ export const updateProfile = async (
   if (!res.ok) throw new Error("Cannot update profile");
   return res.json(); // user data
 };
+
+export const fetchAndStoreUser = async (accessToken: string) => {
+  const user = await fetchUser(accessToken);
+  if (typeof window !== "undefined") {
+    localStorage.setItem("user", JSON.stringify(user));
+    if (user.expertInformation) {
+      localStorage.setItem("expertInformation", JSON.stringify(user.expertInformation));
+    }
+  }
+  return user;
+};
+
+

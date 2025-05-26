@@ -191,3 +191,28 @@ export function apiDelete<T>(
     ...options,
   });
 }
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://emeet.gahonghac.net/api/v1";
+
+export const fetchWithAuth = async (
+  input: RequestInfo,
+  init: RequestInit = {}
+) => {
+  // Lấy accessToken từ localStorage
+  const userStr = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+  let accessToken = "";
+  if (userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      accessToken = user.accessToken || "";
+    } catch {}
+  }
+
+  // Thêm Authorization header nếu có token
+  const headers = new Headers(init.headers || {});
+  if (accessToken) {
+    headers.set("Authorization", `Bearer ${accessToken}`);
+  }
+
+  return fetch(input, { ...init, headers });
+};
