@@ -58,7 +58,7 @@ export const updateProfile = async (
       "Content-Type": "multipart/form-data",
     },
     body: formData,
-  });
+    });
   if (!res.ok) throw new Error("Cannot update profile");
   return res.json(); // user data
 };

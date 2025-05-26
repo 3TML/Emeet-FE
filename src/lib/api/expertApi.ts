@@ -27,10 +27,13 @@ export const getExpertByNameAndCategory = async (
   return res.json();
 };
 
+
 export const uploadCertificates = async (expertId: string, certificates: File[]) => {
   const formData = new FormData();
   formData.append("ExpertId", expertId);
   certificates.forEach((file) => formData.append("Certificates", file));
+
+
   const res = await fetchWithAuth(`${API_URL}/expert/UploadCertificates`, {
     method: "POST",
     body: formData,

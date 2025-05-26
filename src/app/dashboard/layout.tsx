@@ -72,6 +72,7 @@ const expertMenu = [
   { title: "Link cuộc gọi", href: "/dashboard/expert/call-link", icon: "📞" },
   { title: "Đánh giá & phản hồi", href: "/dashboard/expert/reviews", icon: "⭐" },
   { title: "Thu nhập", href: "/dashboard/expert/income", icon: "🪴" },
+  { title: "Hồ sơ", href: "/dashboard/expert/profile", icon: "🪴" },
 ];
 
 export default function DashboardLayout({
