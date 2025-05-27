@@ -17,7 +17,6 @@ export type FetchOptions = RequestInit & {
   timeout?: number;
   retries?: number;
   retryDelay?: number;
-  credentials?: RequestCredentials;
 };
 
 /**
@@ -31,7 +30,6 @@ export async function fetchWithRetry<T>(
     timeout = DEFAULT_TIMEOUT,
     retries = MAX_RETRIES,
     retryDelay = RETRY_DELAY,
-    credentials = "include", // Default to include credentials for CORS
     ...fetchOptions
   } = options;
 
@@ -52,7 +50,6 @@ export async function fetchWithRetry<T>(
       const response = await fetch(url, {
         ...fetchOptions,
         headers,
-        credentials, // Include credentials for CORS
         signal: controller.signal,
         mode: "cors", // Explicitly set CORS mode
       });
@@ -174,7 +171,6 @@ export async function fetchWithRetry<T>(
 export function apiGet<T>(url: string, options: FetchOptions = {}): Promise<T> {
   return fetchWithRetry<T>(url, {
     method: "GET",
-    credentials: "include", // Always include credentials for GET requests
     ...options,
   });
 }
@@ -189,7 +185,6 @@ export function apiPost<T>(
 ): Promise<T> {
   return fetchWithRetry<T>(url, {
     method: "POST",
-    credentials: "include", // Always include credentials for POST requests
     body: JSON.stringify(data),
     ...options,
   });
@@ -205,7 +200,6 @@ export function apiPut<T>(
 ): Promise<T> {
   return fetchWithRetry<T>(url, {
     method: "PUT",
-    credentials: "include", // Always include credentials for PUT requests
     body: JSON.stringify(data),
     ...options,
   });
@@ -220,19 +214,20 @@ export function apiDelete<T>(
 ): Promise<T> {
   return fetchWithRetry<T>(url, {
     method: "DELETE",
-    credentials: "include", // Always include credentials for DELETE requests
     ...options,
   });
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://emeet.gahonghac.net/api/v1";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://emeet.gahonghac.net/api/v1";
 
 export const fetchWithAuth = async (
   input: RequestInfo,
   init: RequestInit = {}
 ) => {
   // Lấy accessToken từ localStorage
-  const userStr = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+  const userStr =
+    typeof window !== "undefined" ? localStorage.getItem("user") : null;
   let accessToken = "";
   if (userStr) {
     try {
