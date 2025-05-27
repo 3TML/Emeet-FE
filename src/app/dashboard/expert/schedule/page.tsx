@@ -5,26 +5,70 @@ import { MdChevronLeft, MdChevronRight, MdClose, MdMenu } from "react-icons/md";
 
 // Types
 const EVENT_TYPES = [
-  { key: "work", label: "Work", color: "bg-green-500" },
-  { key: "personal", label: "Personal", color: "bg-blue-500" },
-  { key: "schedule", label: "Schedule", color: "bg-purple-500" },
-  { key: "gaming", label: "Gaming", color: "bg-orange-500" },
+  { key: "consultation", label: "Consultation", color: "bg-blue-500" },
+  { key: "surgery", label: "Surgery", color: "bg-red-500" },
+  { key: "checkup", label: "Check-up", color: "bg-green-500" },
+  { key: "meeting", label: "Meeting", color: "bg-purple-500" },
+  { key: "training", label: "Training", color: "bg-orange-500" },
+];
+
+const SCHEDULE_STATUS = [
+  { key: "available", label: "Available", color: "bg-green-500" },
+  { key: "busy", label: "Busy", color: "bg-red-500" },
+  { key: "tentative", label: "Tentative", color: "bg-yellow-500" },
 ];
 
 const initialEvents = [
-  { id: 1, title: "Job Hunting Time", date: "2028-03-06", type: "work", color: "bg-green-500", description: "" },
-  { id: 2, title: "Job Interview For SaaS Company", date: "2028-03-13", type: "work", color: "bg-green-500", description: "" },
-  { id: 3, title: "Sleep", date: "2028-03-14", type: "personal", color: "bg-blue-500", description: "" },
-  { id: 4, title: "Eat", date: "2028-03-22", type: "personal", color: "bg-blue-500", description: "" },
-  { id: 5, title: "Play", date: "2028-03-22", type: "gaming", color: "bg-orange-500", description: "" },
-  { id: 6, title: "Jogging to prepare for marathon", date: "2028-03-17", type: "schedule", color: "bg-purple-500", description: "" },
-  { id: 7, title: "Graduation Day", date: "2028-03-03", type: "personal", color: "bg-blue-500", description: "" },
-  { id: 8, title: "Friend's Wedding", date: "2028-03-05", type: "personal", color: "bg-blue-500", description: "" },
-  { id: 9, title: "Gacha Games Event", date: "2028-03-31", type: "gaming", color: "bg-orange-500", description: "" },
-  { id: 10, title: "Eat with senpai", date: "2028-03-01", type: "personal", color: "bg-blue-500", description: "" },
-  { id: 11, title: "Eat with senpai", date: "2028-03-31", type: "personal", color: "bg-blue-500", description: "" },
-  { id: 12, title: "Gaming with friends", date: "2028-03-29", type: "gaming", color: "bg-orange-500", description: "" },
-  { id: 13, title: "I have no idea", date: "2028-03-18", type: "other", color: "bg-gray-400", description: "" },
+  {
+    id: 1,
+    title: "Morning Consultation",
+    startDate: "2024-03-06T09:00:00",
+    endDate: "2024-03-06T10:30:00",
+    type: "consultation",
+    status: "busy",
+    color: "bg-blue-500",
+    description: "Regular patient consultation"
+  },
+  {
+    id: 2,
+    title: "Cardiac Surgery",
+    startDate: "2024-03-13T08:00:00",
+    endDate: "2024-03-13T12:00:00",
+    type: "surgery",
+    status: "busy",
+    color: "bg-red-500",
+    description: "Scheduled cardiac surgery"
+  },
+  {
+    id: 3,
+    title: "Patient Check-up",
+    startDate: "2024-03-14T14:00:00",
+    endDate: "2024-03-14T15:00:00",
+    type: "checkup",
+    status: "available",
+    color: "bg-green-500",
+    description: "Follow-up check-up"
+  },
+  {
+    id: 4,
+    title: "Team Meeting",
+    startDate: "2024-03-22T10:00:00",
+    endDate: "2024-03-22T11:00:00",
+    type: "meeting",
+    status: "busy",
+    color: "bg-purple-500",
+    description: "Weekly team meeting"
+  },
+  {
+    id: 5,
+    title: "Training Session",
+    startDate: "2024-03-22T13:00:00",
+    endDate: "2024-03-22T15:00:00",
+    type: "training",
+    status: "tentative",
+    color: "bg-orange-500",
+    description: "New procedure training"
+  }
 ];
 
 const expert = {
@@ -185,42 +229,85 @@ const SchedulePage = () => {
           </div>
           <div className="grid grid-cols-7 gap-2">
             {weeks.flat().map((day, idx) => {
-              const dayEvents = events.filter(e => e.date === format(day, 'yyyy-MM-dd') && filters.includes(e.type));
+              const dayEvents = events.filter(e => {
+                const eventStart = new Date(e.startDate);
+                return isSameDay(day, eventStart) && filters.includes(e.type);
+              });
               const isCurrentMonth = isSameMonth(day, currentMonth);
               const isToday = isSameDay(day, new Date());
               return (
                 <div
                   key={idx}
-                  className={`rounded-lg min-h-[90px] p-1 md:p-2 flex flex-col border transition-all duration-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 ${isCurrentMonth ? 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800' : 'bg-gray-50 dark:bg-zinc-800 border-gray-100 dark:border-zinc-800 opacity-60'} ${isToday ? 'ring-2 ring-blue-400' : ''}`}
+                  className={`rounded-lg min-h-[120px] p-1 md:p-2 flex flex-col border transition-all duration-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                    isCurrentMonth ? 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800' : 'bg-gray-50 dark:bg-zinc-800 border-gray-100 dark:border-zinc-800 opacity-60'
+                  } ${isToday ? 'ring-2 ring-blue-400' : ''}`}
                   tabIndex={0}
                   aria-label={`Day ${format(day, 'd MMMM yyyy')}`}
                   onClick={() => handleDayClick(day)}
                   onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && handleDayClick(day)}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className={`text-xs font-bold ${isCurrentMonth ? 'text-gray-700 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500'}`}>{format(day, 'd')}</span>
+                    <span className={`text-xs font-bold ${
+                      isCurrentMonth ? 'text-gray-700 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500'
+                    }`}>
+                      {format(day, 'd')}
+                    </span>
                     <button
                       className="text-xs text-blue-500 hover:underline focus:outline-none"
                       tabIndex={0}
-                      aria-label="Add event"
-                      onClick={e => { e.stopPropagation(); setModal({ open: true, mode: 'create', event: null, date: format(day, 'yyyy-MM-dd') }); }}
-                      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); setModal({ open: true, mode: 'create', event: null, date: format(day, 'yyyy-MM-dd') }); } }}
-                    >+
+                      aria-label="Add schedule"
+                      onClick={e => {
+                        e.stopPropagation();
+                        setModal({
+                          open: true,
+                          mode: 'create',
+                          event: null,
+                          date: format(day, 'yyyy-MM-dd')
+                        });
+                      }}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.stopPropagation();
+                          setModal({
+                            open: true,
+                            mode: 'create',
+                            event: null,
+                            date: format(day, 'yyyy-MM-dd')
+                          });
+                        }
+                      }}
+                    >
+                      +
                     </button>
                   </div>
                   <div className="flex flex-col gap-1">
-                    {dayEvents.map(ev => (
-                      <button
-                        key={ev.id}
-                        className={`truncate px-2 py-1 rounded text-xs font-semibold text-white ${ev.color} focus:outline-none focus:ring-2 focus:ring-blue-400`}
-                        tabIndex={0}
-                        aria-label={`Edit event: ${ev.title}`}
-                        onClick={e => { e.stopPropagation(); handleEventClick(ev); }}
-                        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); handleEventClick(ev); } }}
-                      >
-                        {ev.title}
-                      </button>
-                    ))}
+                    {dayEvents.map(ev => {
+                      const startTime = format(new Date(ev.startDate), 'HH:mm');
+                      const endTime = format(new Date(ev.endDate), 'HH:mm');
+                      return (
+                        <button
+                          key={ev.id}
+                          className={`truncate px-2 py-1 rounded text-xs font-semibold text-white ${ev.color} focus:outline-none focus:ring-2 focus:ring-blue-400`}
+                          tabIndex={0}
+                          aria-label={`Edit schedule: ${ev.title} from ${startTime} to ${endTime}`}
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleEventClick(ev);
+                          }}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.stopPropagation();
+                              handleEventClick(ev);
+                            }
+                          }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span>{ev.title}</span>
+                            <span className="text-[10px] opacity-80">{startTime}-{endTime}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -280,19 +367,30 @@ const MiniCalendar = ({ currentMonth, selectedDate, setSelectedDate, setCurrentM
   );
 };
 
-// Add type for event form state
+// Update EventForm type
 type EventForm = {
   id?: number;
   title: string;
-  date: string;
+  startDate: string;
+  endDate: string;
   type: string;
+  status: string;
   color: string;
   description: string;
 };
 
-// Event Modal Component
+// Update EventModal component
 const EventModal = ({ mode, event, date, onClose, onSave, onDelete }: any) => {
-  const [form, setForm] = useState<EventForm>(event || { title: '', date: date || '', type: EVENT_TYPES[0].key, color: EVENT_TYPES[0].color, description: '' });
+  const [form, setForm] = useState<EventForm>(event || {
+    title: '',
+    startDate: date ? `${date}T09:00:00` : '',
+    endDate: date ? `${date}T10:00:00` : '',
+    type: EVENT_TYPES[0].key,
+    status: SCHEDULE_STATUS[0].key,
+    color: EVENT_TYPES[0].color,
+    description: ''
+  });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     if (e.target.name === 'type') {
@@ -300,40 +398,110 @@ const EventModal = ({ mode, event, date, onClose, onSave, onDelete }: any) => {
       if (found) setForm((f: EventForm) => ({ ...f, color: found.color }));
     }
   };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Validate dates
+    if (new Date(form.startDate) >= new Date(form.endDate)) {
+      alert('End time must be after start time');
+      return;
+    }
     onSave(form);
   };
+
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-30">
       <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-lg p-6 w-full max-w-md relative">
         <button onClick={onClose} className="absolute top-2 right-2 p-1 rounded hover:bg-gray-100 dark:hover:bg-zinc-700" aria-label="Close modal"><MdClose size={18} /></button>
-        <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">{mode === 'create' ? 'Add Event' : 'Edit Event'}</h3>
+        <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">{mode === 'create' ? 'Add Schedule' : 'Edit Schedule'}</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Title</label>
-            <input name="title" value={form.title} onChange={handleChange} required className="w-full px-3 py-2 rounded border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <input
+              name="title"
+              value={form.title}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 rounded border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Date</label>
-            <input name="date" type="date" value={form.date} onChange={handleChange} required className="w-full px-3 py-2 rounded border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400" />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Start Time</label>
+              <input
+                name="startDate"
+                type="datetime-local"
+                value={form.startDate}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 rounded border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">End Time</label>
+              <input
+                name="endDate"
+                type="datetime-local"
+                value={form.endDate}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 rounded border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Type</label>
-            <select name="type" value={form.type} onChange={handleChange} className="w-full px-3 py-2 rounded border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400">
-              {EVENT_TYPES.map(t => (
-                <option key={t.key} value={t.key}>{t.label}</option>
-              ))}
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Type</label>
+              <select
+                name="type"
+                value={form.type}
+                onChange={handleChange}
+                className="w-full px-3 py-2 rounded border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                {EVENT_TYPES.map(t => (
+                  <option key={t.key} value={t.key}>{t.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Status</label>
+              <select
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+                className="w-full px-3 py-2 rounded border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                {SCHEDULE_STATUS.map(s => (
+                  <option key={s.key} value={s.key}>{s.label}</option>
+                ))}
+              </select>
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label>
-            <textarea name="description" value={form.description} onChange={handleChange} rows={2} className="w-full px-3 py-2 rounded border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              rows={2}
+              className="w-full px-3 py-2 rounded border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
           </div>
           <div className="flex gap-2 mt-4">
-            <button type="submit" className="flex-1 px-4 py-2 rounded bg-blue-500 text-white font-semibold hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">{mode === 'create' ? 'Add' : 'Save'}</button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2 rounded bg-blue-500 text-white font-semibold hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              {mode === 'create' ? 'Add Schedule' : 'Save Changes'}
+            </button>
             {mode === 'edit' && (
-              <button type="button" onClick={() => onDelete(form.id)} className="px-4 py-2 rounded bg-red-500 text-white font-semibold hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">Delete</button>
+              <button
+                type="button"
+                onClick={() => onDelete(form.id)}
+                className="px-4 py-2 rounded bg-red-500 text-white font-semibold hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
+              >
+                Delete
+              </button>
             )}
           </div>
         </form>

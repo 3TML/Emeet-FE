@@ -33,6 +33,8 @@ type AdminCategoriesRoute = Route<"/dashboard/admin/categories">;
 type AdminTransactionsRoute = Route<"/dashboard/admin/transactions">;
 type AdminSchedulesRoute = Route<"/dashboard/admin/schedules">;
 type AdminReportsRoute = Route<"/dashboard/admin/reports">;
+type UsersRoute = Route<"/dashboard/users">;
+type ExpertProfileRoute = Route<"/dashboard/expert/profile">;
 type SettingsRoute = Route<"/dashboard/settings">;
 type ProfileRoute = Route<"/dashboard/profile">;
 type LoginRoute = Route<"/login">;
@@ -46,14 +48,16 @@ type AppRoute =
   | AdminTransactionsRoute
   | AdminSchedulesRoute
   | AdminReportsRoute
+  | UsersRoute
+  | ExpertProfileRoute
   | SettingsRoute
   | ProfileRoute
   | LoginRoute;
 
 // Navigation items with proper typing
-const navItems = [
+const baseNavItems = [
   {
-    title: "Dashboard",
+    title: "Trang chủ",
     href: "/dashboard" as DashboardRoute,
     icon: LayoutDashboard,
   },
@@ -65,8 +69,25 @@ const navItems = [
 
   {
     title: "Settings",
+    title: "Cài đặt",
     href: "/dashboard/settings" as SettingsRoute,
     icon: Settings,
+  },
+] as const;
+
+const userOnlyNavItems = [
+  {
+    title: "Người dùng",
+    href: "/dashboard/users" as UsersRoute,
+    icon: Users,
+  },
+] as const;
+
+const expertOnlyNavItems = [
+  {
+    title: "Hồ sơ",
+    href: "/dashboard/expert/profile" as ExpertProfileRoute,
+    icon: Users,
   },
 ] as const;
 
@@ -81,6 +102,7 @@ const expertMenu = [
     icon: "⭐",
   },
   { title: "Thu nhập", href: "/dashboard/expert/income", icon: "🪴" },
+  { title: "Hồ sơ", href: "/dashboard/expert/profile", icon: "🪴" },
 ];
 
 const adminMenu = [
@@ -224,6 +246,70 @@ export default function DashboardLayout({
                 })}
               </>
             )}
+            {/* Base navigation items - always shown */}
+            {baseNavItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Button
+                  key={item.href}
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start gap-3",
+                    isActive
+                      ? "bg-gray-100 dark:bg-gray-700 text-primary"
+                      : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                  )}
+                  onClick={() => router.push(item.href as AppRoute)}
+                >
+                  <item.icon size={20} />
+                  {item.title}
+                </Button>
+              );
+            })}
+
+            {/* User-only navigation items */}
+            {role === "user" &&
+              userOnlyNavItems.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Button
+                    key={item.href}
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-start gap-3",
+                      isActive
+                        ? "bg-gray-100 dark:bg-gray-700 text-primary"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                    )}
+                    onClick={() => router.push(item.href as AppRoute)}
+                  >
+                    <item.icon size={20} />
+                    {item.title}
+                  </Button>
+                );
+              })}
+
+            {/* Expert-only navigation items */}
+            {role === "expert" &&
+              expertOnlyNavItems.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Button
+                    key={item.href}
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-start gap-3",
+                      isActive
+                        ? "bg-gray-100 dark:bg-gray-700 text-primary"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                    )}
+                    onClick={() => router.push(item.href as AppRoute)}
+                  >
+                    <item.icon size={20} />
+                    {item.title}
+                  </Button>
+                );
+              })}
 
             {/* Hiển thị expert menu nếu role là expert */}
             {role === "expert" && (
@@ -279,15 +365,18 @@ export default function DashboardLayout({
         <header className="sticky top-0 z-30 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between px-6 py-4">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              {navItems.find((item) => item.href === pathname)?.title ||
-                "Dashboard"}
+              {[
+                ...baseNavItems,
+                ...(role === "user" ? userOnlyNavItems : []),
+                ...(role === "expert" ? expertOnlyNavItems : []),
+              ].find((item) => item.href === pathname)?.title || "Trang chủ"}
             </h2>
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
                 size="icon"
                 className="relative"
-                aria-label="Notifications"
+                aria-label="Thông báo"
               >
                 <Bell size={20} />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
@@ -295,7 +384,7 @@ export default function DashboardLayout({
               <Button
                 variant="ghost"
                 size="icon"
-                aria-label="Profile"
+                aria-label="Hồ sơ"
                 onClick={() =>
                   router.push("/dashboard/profile" as ProfileRoute)
                 }

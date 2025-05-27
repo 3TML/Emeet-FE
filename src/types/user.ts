@@ -33,3 +33,20 @@ export type User = {
   status?: string;
   [key: string]: any;
 };
+
+export type Expert = {
+  id: string;
+  email: string;
+  fullName: string;
+  avatar?: string;
+  bio: string;
+  gender: string;
+  dateCreate: Date;
+  dateUpdated: Date;
+  status: string;
+  expertId: string;
+  experience: string;
+  totalReview: number;
+  rate: number;
+};
+

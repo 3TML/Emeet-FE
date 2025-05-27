@@ -99,7 +99,7 @@ const AppointmentsPage = () => {
       <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* List of Appointments */}
         <section className="w-full">
-          <h1 className="text-2xl md:text-3xl font-bold mb-6 text-zinc-900">Lịch hẹn của bạn</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-6 text-zinc-900">Lịch hẹn của bạn đang chờ bạn duyệt</h1>
           <ul className="flex flex-col gap-4" aria-label="Danh sách lịch hẹn">
             {appointments.map((appt) => (
               <li key={appt.id}>
