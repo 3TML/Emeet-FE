@@ -25,10 +25,15 @@ export const getExpertByNameAndCategory = async (
   return res.json();
 };
 
-export const uploadCertificates = async (expertId: string) => {
+export const uploadCertificates = async (expertId: string, selectedFiles: File[]) => {
+  const formData = new FormData();
+  formData.append("expertId", expertId);
+  selectedFiles.forEach((file) => {
+    formData.append("files", file);
+  });
   const res = await fetch(`${API_URL}/expert/UploadCertificates`, {
     method: "POST",
-    body: JSON.stringify({ expertId }),
+    body: formData,
   });
   if (!res.ok) throw new Error("Cannot upload certificates");
   return res.json();
@@ -49,5 +54,13 @@ export const getCertificatesByExpertId = async (expertId: string) => {
     `${API_URL}/expert/GetCertificatesByExpertId/${expertId}`
   );
   if (!res.ok) throw new Error("Cannot fetch certificates by expertId");
+  return res.json();
+};
+
+export const getFeedbackByExpertId = async (expertId: string) => {
+  const res = await fetch(
+    `${API_URL}/feedback/GetFeedbackExpert/${expertId}`
+  );
+  if (!res.ok) throw new Error("Cannot fetch Feedback by expertId");
   return res.json();
 };

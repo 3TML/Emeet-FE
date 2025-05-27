@@ -81,6 +81,7 @@ const expertMenu = [
     icon: "⭐",
   },
   { title: "Thu nhập", href: "/dashboard/expert/income", icon: "🪴" },
+  { title: "Hồ sơ", href: "/dashboard/expert/profile", icon: "🪴" },
 ];
 
 const adminMenu = [
