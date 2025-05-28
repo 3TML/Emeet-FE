@@ -12,6 +12,7 @@ import {
 } from "@/lib/api/expertApi";
 import { getCategoryApi } from "@/lib/api/user";
 import type { Category } from "@/types/user";
+import { useRouter } from "next/navigation";
 
 // Define route types
 type ExpertsRoute = Route<"/experts">;
@@ -37,6 +38,7 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,18 +78,13 @@ export default function HomePage() {
     setLoading(false);
   };
 
-  const handleSearch = async () => {
-    setLoading(true);
-    try {
-      const filtered = await getExpertByNameAndCategory(
-        searchText,
-        selectedCategory
-      );
-      setExperts(filtered);
-    } catch (err) {
-      // handle error
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchText.trim()) {
+      router.push(`/find?search=${encodeURIComponent(searchText.trim())}`);
+    } else {
+      router.push("/find");
     }
-    setLoading(false);
   };
 
   const benefits = [

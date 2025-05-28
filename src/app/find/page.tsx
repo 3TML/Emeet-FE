@@ -1,58 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UserHeader from "@/components/UserHeader";
-
-const categories = [
-  "Tư vấn kinh doanh",
-  "Công nghệ thông tin",
-  "Tài chính & Đầu tư",
-  "Marketing",
-  "Sức khỏe & Đời sống",
-  "Luật pháp",
-];
-
-const experts = [
-  {
-    name: "Nguyễn Văn A",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    category: "Tư vấn kinh doanh",
-    experience: 8,
-    bio: "Chuyên gia tư vấn chiến lược kinh doanh, phát triển doanh nghiệp vừa và nhỏ.",
-  },
-  {
-    name: "Trần Thị B",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-    category: "Công nghệ thông tin",
-    experience: 5,
-    bio: "Kỹ sư phần mềm, chuyên về giải pháp chuyển đổi số và AI.",
-  },
-  {
-    name: "Lê Văn C",
-    avatar: "https://randomuser.me/api/portraits/men/65.jpg",
-    category: "Tài chính & Đầu tư",
-    experience: 10,
-    bio: "Chuyên gia đầu tư, quản lý tài sản cá nhân và doanh nghiệp.",
-  },
-  {
-    name: "Phạm Thị D",
-    avatar: "https://randomuser.me/api/portraits/women/68.jpg",
-    category: "Marketing",
-    experience: 3,
-    bio: "Chuyên gia marketing số, xây dựng thương hiệu cá nhân và doanh nghiệp.",
-  },
-  {
-    name: "Ngô Văn E",
-    avatar: "https://randomuser.me/api/portraits/men/77.jpg",
-    category: "Sức khỏe & Đời sống",
-    experience: 12,
-    bio: "Bác sĩ, chuyên gia tư vấn sức khỏe, dinh dưỡng và lối sống lành mạnh.",
-  },
-];
+import { getSugestionExperts } from "@/lib/api/expertApi";
+import { getCategoryApi } from "@/lib/api/user";
+import { useSearchParams } from "next/navigation";
 
 const FindExpertsPage = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [minExperience, setMinExperience] = useState(0);
+  const [experts, setExperts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const searchText = searchParams.get("search") || "";
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Lấy categories từ API riêng
+        const catData = await getCategoryApi();
+        const catNames = Array.isArray(catData) ? catData.map((c: any) => c.name).filter(Boolean) : [];
+        setCategories(catNames);
+        // Lấy chuyên gia
+        const data = await getSugestionExperts();
+        const mapped = data.map((item: any) => ({
+          name: item.fullName,
+          avatar: item.avatar,
+          category: item.listCategory && item.listCategory.length > 0 ? item.listCategory[0] : "",
+          experience: typeof item.experience === "string" ? parseInt(item.experience) || 0 : item.experience || 0,
+          bio: item.bio || "",
+          listCategory: item.listCategory || [],
+        }));
+        setExperts(mapped);
+      } catch (err: any) {
+        setError("Không thể tải dữ liệu.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleCategoryToggle = (category: string) => {
     setSelectedCategories((prev) =>
@@ -74,8 +65,10 @@ const FindExpertsPage = () => {
   const filteredExperts = experts.filter(
     (expert) =>
       (selectedCategories.length === 0 ||
-        selectedCategories.includes(expert.category)) &&
-      expert.experience >= minExperience
+        expert.listCategory.some((cat: string) => selectedCategories.includes(cat))) &&
+      expert.experience >= minExperience &&
+      (searchText.trim() === "" ||
+        expert.name.toLowerCase().includes(searchText.trim().toLowerCase()))
   );
 
   return (
@@ -98,28 +91,32 @@ const FindExpertsPage = () => {
                 Lĩnh vực
               </label>
               <div className="grid grid-cols-1 gap-3 mb-6">
-                {categories.map((cat) => (
-                  <label
-                    key={cat}
-                    className="flex items-center gap-3 cursor-pointer text-gray-700 text-base font-medium bg-white rounded-lg px-4 py-2 shadow-sm hover:bg-blue-100 focus-within:bg-blue-100 transition-colors outline-none"
-                    tabIndex={0}
-                    aria-label={`Chọn lĩnh vực ${cat}`}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ")
-                        handleCategoryToggle(cat);
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedCategories.includes(cat)}
-                      onChange={() => handleCategoryToggle(cat)}
-                      className="accent-blue-600 w-5 h-5 rounded focus:ring-2 focus:ring-blue-400"
-                      tabIndex={-1}
-                      aria-checked={selectedCategories.includes(cat)}
-                    />
-                    <span>{cat}</span>
-                  </label>
-                ))}
+                {categories.length === 0 && !loading ? (
+                  <span className="text-gray-400">Không có lĩnh vực</span>
+                ) : (
+                  categories.map((cat) => (
+                    <label
+                      key={cat}
+                      className="flex items-center gap-3 cursor-pointer text-gray-700 text-base font-medium bg-white rounded-lg px-4 py-2 shadow-sm hover:bg-blue-100 focus-within:bg-blue-100 transition-colors outline-none"
+                      tabIndex={0}
+                      aria-label={`Chọn lĩnh vực ${cat}`}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ")
+                          handleCategoryToggle(cat);
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedCategories.includes(cat)}
+                        onChange={() => handleCategoryToggle(cat)}
+                        className="accent-blue-600 w-5 h-5 rounded focus:ring-2 focus:ring-blue-400"
+                        tabIndex={-1}
+                        aria-checked={selectedCategories.includes(cat)}
+                      />
+                      <span>{cat}</span>
+                    </label>
+                  ))
+                )}
               </div>
               <label
                 htmlFor="experience"
@@ -142,7 +139,15 @@ const FindExpertsPage = () => {
           </aside>
           {/* Expert List */}
           <section className="w-full md:w-2/3 lg:w-3/4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredExperts.length === 0 ? (
+            {loading ? (
+              <div className="col-span-full text-center text-gray-500 text-lg">
+                Đang tải chuyên gia...
+              </div>
+            ) : error ? (
+              <div className="col-span-full text-center text-red-500 text-lg">
+                {error}
+              </div>
+            ) : filteredExperts.length === 0 ? (
               <div className="col-span-full text-center text-gray-500 text-lg">
                 Không tìm thấy chuyên gia phù hợp.
               </div>
